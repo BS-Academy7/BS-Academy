@@ -419,6 +419,46 @@ const SECTOR_TRACKS = {
    the display order on the homepage)
    ============================================ */
 const SECTOR_ORDER = ['engineering', 'automation', 'accounting', 'academic', 'highschool', 'kids'];
+let sectorOverviewRenderToken = 0;
+
+function getLocalSectorOverviewData() {
+  return SECTOR_ORDER.map(key => {
+    const s = SECTOR_TRACKS[key];
+    return s ? { key, ...s } : null;
+  }).filter(Boolean);
+}
+
+function mapLiveSectorRows(rows) {
+  return rows.map(row => ({
+    key: row.sector_key,
+    number: row.sort_order ? `0${row.sort_order} / ${row.sector_key.toUpperCase()}` : row.sector_key.toUpperCase(),
+    title_ar: row.title_ar,
+    title_en: row.title_en,
+    desc_ar: row.desc_ar,
+    desc_en: row.desc_en,
+    banner_main: row.banner_url
+  }));
+}
+
+function injectSectorOverviewCards(container, sectors, lang) {
+  container.innerHTML = sectors.map(s => `
+    <a href="#sector-detail-${s.key}" data-nav="sector-detail" data-sector-key="${s.key}" class="sector-overview-card reveal">
+      <div class="sector-overview-card-banner">
+        ${s.banner_main ? `<img src="${s.banner_main}" alt="${lang === 'ar' ? s.title_ar : s.title_en}" loading="lazy" decoding="async">` : '<div class="sector-overview-card-noimg"></div>'}
+      </div>
+      <div class="sector-overview-card-body">
+        <span class="sector-number">${s.number}</span>
+        <h3>${lang === 'ar' ? s.title_ar : s.title_en}</h3>
+        <p>${lang === 'ar' ? s.desc_ar : s.desc_en}</p>
+        <span class="sector-overview-card-link">${lang === 'ar' ? 'اعرف أكتر ←' : 'Learn more →'}</span>
+      </div>
+    </a>
+  `).join('');
+
+  requestAnimationFrame(() => {
+    container.querySelectorAll('.reveal').forEach(el => el.classList.add('in-view'));
+  });
+}
 
 /* ============================================
    Renderer 1: Homepage "overview" cards —
@@ -437,45 +477,17 @@ async function renderSectorOverviewCards() {
   if (!container) return;
 
   const lang = currentLang || 'ar';
-  let sectors = [];
+  const renderToken = ++sectorOverviewRenderToken;
+  injectSectorOverviewCards(container, getLocalSectorOverviewData(), lang);
 
-  // Try the live database first
+  // Refresh from the live database in the background.
+  // The local cards are already visible, so a slow network never leaves this section blank.
   if (typeof bsGetTopLevelSectors === 'function' && typeof isSupabaseConfigured !== 'undefined' && isSupabaseConfigured) {
     const liveSectors = await bsGetTopLevelSectors();
-    if (liveSectors && liveSectors.length) {
-      sectors = liveSectors.map(row => ({
-        key: row.sector_key,
-        number: row.sort_order ? `0${row.sort_order} / ${row.sector_key.toUpperCase()}` : row.sector_key.toUpperCase(),
-        title_ar: row.title_ar,
-        title_en: row.title_en,
-        desc_ar: row.desc_ar,
-        desc_en: row.desc_en,
-        banner_main: row.banner_url
-      }));
+    if (renderToken === sectorOverviewRenderToken && liveSectors && liveSectors.length) {
+      injectSectorOverviewCards(container, mapLiveSectorRows(liveSectors), lang);
     }
   }
-
-  // Fallback to local static data if the database had nothing
-  if (!sectors.length) {
-    sectors = SECTOR_ORDER.map(key => {
-      const s = SECTOR_TRACKS[key];
-      return s ? { key, ...s } : null;
-    }).filter(Boolean);
-  }
-
-  container.innerHTML = sectors.map(s => `
-    <a href="#sector-detail-${s.key}" data-nav="sector-detail" data-sector-key="${s.key}" class="sector-overview-card reveal">
-      <div class="sector-overview-card-banner">
-        ${s.banner_main ? `<img src="${s.banner_main}" alt="${lang === 'ar' ? s.title_ar : s.title_en}" loading="lazy">` : '<div class="sector-overview-card-noimg"></div>'}
-      </div>
-      <div class="sector-overview-card-body">
-        <span class="sector-number">${s.number}</span>
-        <h3>${lang === 'ar' ? s.title_ar : s.title_en}</h3>
-        <p>${lang === 'ar' ? s.desc_ar : s.desc_en}</p>
-        <span class="sector-overview-card-link">${lang === 'ar' ? 'اعرف أكتر ←' : 'Learn more →'}</span>
-      </div>
-    </a>
-  `).join('');
 }
 
 /* ============================================
