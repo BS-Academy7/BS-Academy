@@ -1,0 +1,87 @@
+/* ============================================
+   B&S Academy — Design Tokens
+   Derived from the brand seal: deep navy, teal
+   gradient, gold ring, silver laurel.
+   ============================================ */
+
+:root {
+  /* ---- Color: Core ---- */
+  --navy-deep: #0B1F3A;       /* primary dark background */
+  --navy-deeper: #071527;     /* darkest layer / footer */
+  --navy-soft: #122A4D;       /* card surfaces on dark */
+  --teal-accent: #2A8C82;     /* signature gradient end */
+  --teal-bright: #3FB6A8;     /* hover / active teal */
+  --gold-signature: #C9A961;  /* metallic ring gold */
+  --gold-bright: #E0C387;     /* gold hover state */
+  --silver-mist: #B8C4D1;     /* laurel silver, muted text on dark */
+  --paper: #F7F5F0;           /* light section background */
+  --paper-warm: #F1ECE2;      /* alternate light surface */
+  --ink: #14213D;             /* primary text on light */
+  --ink-soft: #4A5876;        /* secondary text on light */
+
+  /* ---- Color: Sector accents (derived from core palette) ---- */
+  --sector-engineering: #2A8C82;   /* teal — circuits, precision */
+  --sector-accounting: #C9A961;    /* gold — financial, value */
+  --sector-academic: #6B7FA8;      /* slate blue — research, calm */
+  --sector-highschool: #4A8FB8;    /* clear blue — clarity, focus */
+  --sector-kids: #5FAFA0;          /* soft teal-green — playful but on-brand */
+
+  /* ---- Typography ---- */
+  --font-display: 'Fraunces', 'IBM Plex Sans Arabic', serif;
+  --font-body: 'Inter', 'IBM Plex Sans Arabic', sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 4rem;
+
+  /* ---- Spacing ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  /* ---- Layout ---- */
+  --container-max: 1280px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 180ms;
+  --dur-base: 320ms;
+  --dur-slow: 600ms;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 2px 8px rgba(11, 31, 58, 0.08);
+  --shadow-md: 0 8px 24px rgba(11, 31, 58, 0.14);
+  --shadow-lg: 0 20px 48px rgba(11, 31, 58, 0.22);
+  --shadow-gold-glow: 0 0 0 1px rgba(201, 169, 97, 0.3), 0 8px 24px rgba(201, 169, 97, 0.12);
+}
+
+/* RTL/LTR direction-aware logical properties handled via [dir] attribute in components */
+[dir="rtl"] {
+  --font-primary: var(--font-arabic);
+}
+[dir="ltr"] {
+  --font-primary: var(--font-body);
+}

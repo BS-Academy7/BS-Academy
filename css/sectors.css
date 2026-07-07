@@ -1,0 +1,182 @@
+/* ============================================
+   Academic Sectors — each with a subtle visual
+   fingerprint tied to its discipline.
+   ============================================ */
+
+.sectors-section {
+  background: var(--navy-deep);
+  color: var(--paper);
+  position: relative;
+}
+
+.sectors-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto var(--space-16);
+}
+
+.sectors-header h2 {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-4);
+}
+
+.sectors-header p {
+  color: var(--silver-mist);
+  font-size: var(--text-lg);
+}
+
+.sector-block {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: var(--space-12);
+  align-items: center;
+  padding-block: var(--space-16);
+  border-top: 1px solid rgba(184, 196, 209, 0.12);
+}
+
+.sector-block:first-of-type { border-top: none; }
+
+.sector-block.reverse {
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.sector-block.reverse .sector-visual { order: 2; }
+.sector-block.reverse .sector-text { order: 1; }
+
+@media (max-width: 900px) {
+  .sector-block,
+  .sector-block.reverse {
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+  .sector-block.reverse .sector-visual,
+  .sector-block.reverse .sector-text {
+    order: unset;
+  }
+}
+
+.sector-number {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--sector-color, var(--gold-signature));
+  margin-bottom: var(--space-3);
+  display: block;
+}
+
+.sector-text h3 {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-4);
+  color: var(--paper);
+}
+
+.sector-text p {
+  color: var(--silver-mist);
+  font-size: var(--text-base);
+  line-height: 1.75;
+  margin-bottom: var(--space-6);
+}
+
+.sector-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sector-track {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255,255,255,0.03);
+  border-inline-start: 2px solid var(--sector-color, var(--gold-signature));
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+.sector-track strong {
+  color: var(--paper);
+  display: block;
+  margin-bottom: var(--space-1);
+}
+
+.sector-track span {
+  color: var(--silver-mist);
+  font-size: var(--text-xs);
+}
+
+.sector-cta {
+  margin-top: var(--space-6);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--sector-color, var(--gold-bright));
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: gap var(--dur-fast) var(--ease-standard);
+}
+
+.sector-cta:hover { gap: var(--space-3); }
+
+/* Visual panel per sector */
+.sector-visual {
+  position: relative;
+  aspect-ratio: 4/3;
+  border-radius: var(--radius-lg);
+  background: var(--navy-soft);
+  border: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sector-visual svg { width: 100%; height: 100%; }
+
+/* Sector color theming via inline custom property set per block */
+.sector-block[data-sector="engineering"] { --sector-color: var(--sector-engineering); }
+.sector-block[data-sector="accounting"] { --sector-color: var(--sector-accounting); }
+.sector-block[data-sector="academic"] { --sector-color: var(--sector-academic); }
+.sector-block[data-sector="highschool"] { --sector-color: var(--sector-highschool); }
+.sector-block[data-sector="kids"] { --sector-color: var(--sector-kids); }
+
+/* Industrial gallery (Sector 1 extra feature) */
+.industrial-gallery {
+  margin-top: var(--space-8);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+}
+
+@media (max-width: 768px) {
+  .industrial-gallery { grid-template-columns: repeat(2, 1fr); }
+}
+
+.gallery-tile {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  background: var(--navy-soft);
+  border: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.gallery-tile-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: var(--space-3);
+  background: linear-gradient(to top, rgba(7,21,39,0.9), transparent 60%);
+  font-size: var(--text-xs);
+  color: var(--silver-mist);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+
+.gallery-tile:hover .gallery-tile-label { opacity: 1; }

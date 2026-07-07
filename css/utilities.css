@@ -1,0 +1,125 @@
+/* ============================================
+   Shared animations & misc utility components
+   ============================================ */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+}
+
+.reveal.in-view {
+  animation: fade-up 0.7s var(--ease-out-soft) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; animation: none; }
+}
+
+/* Section heading shared pattern (light bg) */
+.section-heading {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto var(--space-12);
+}
+
+.section-heading h2 {
+  font-size: var(--text-3xl);
+  color: var(--ink);
+  margin-bottom: var(--space-4);
+}
+
+.section-heading p {
+  font-size: var(--text-lg);
+  color: var(--ink-soft);
+}
+
+/* Generic responsive card grid (used by kids/highschool subject chips etc.) */
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--paper);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-pill);
+}
+
+/* Toast notification (used for form/admin save feedback) */
+.toast {
+  position: fixed;
+  bottom: var(--space-6);
+  inset-inline-end: var(--space-6);
+  background: var(--navy-deep);
+  color: var(--paper);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  z-index: 2000;
+  transform: translateY(120%);
+  opacity: 0;
+  transition: all var(--dur-base) var(--ease-out-soft);
+  border-inline-start: 3px solid var(--teal-accent);
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast.error { border-inline-start-color: #B8453F; }
+
+/* Loading spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Page visibility helper for our single-document multi-page app */
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  inset-inline-start: -999px;
+  top: 0;
+  background: var(--gold-signature);
+  color: var(--navy-deep);
+  padding: var(--space-3) var(--space-6);
+  z-index: 3000;
+  font-weight: 700;
+}
+
+.skip-link:focus {
+  inset-inline-start: var(--space-4);
+  top: var(--space-4);
+}
