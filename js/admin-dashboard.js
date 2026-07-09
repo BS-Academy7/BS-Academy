@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let currentAdminProfile = null;
   let allAcademyFiles = [];
   let onboardingApplications = [];
+  let siteContacts = [];
 
   // Check initial auth state
   await checkAuth();
@@ -65,6 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (filesNav) filesNav.style.display = canManageDrive(role) ? 'flex' : 'none';
     const onboardingNav = document.querySelector('.nav-item[data-tab="onboarding"]');
     if (onboardingNav) onboardingNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
+    const contactsNav = document.querySelector('.nav-item[data-tab="contacts"]');
+    if (contactsNav) contactsNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
   }
 
   /* ==========================================
@@ -97,6 +100,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     onboardingApplications = typeof bsGetOnboardingApplications === 'function'
       ? await bsGetOnboardingApplications()
       : [];
+    siteContacts = typeof bsGetSiteContacts === 'function'
+      ? await bsGetSiteContacts(true)
+      : [];
     
     // Fetch all academy_files
     const { data: filesData } = await supabaseClient.from('academy_files').select('*');
@@ -104,6 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderRequests(requests);
     renderOnboardingApplications(onboardingApplications);
+    renderContacts(siteContacts);
   }
 
   function renderRequests(requests) {
@@ -276,6 +283,115 @@ document.addEventListener('DOMContentLoaded', async () => {
     const index = flow.findIndex(([stage]) => stage === app.current_stage_key);
     const next = flow[Math.min(index + 1, flow.length - 1)] || flow[0];
     return { stage: next[0], status: next[1] };
+  }
+
+  /* ==========================================
+     Site Contacts
+     ========================================== */
+  const contactForm = document.getElementById('contactForm');
+  const contactResetBtn = document.getElementById('contactResetBtn');
+
+  function renderContacts(contacts) {
+    const tbody = document.getElementById('contactsTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!contacts || contacts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد وسائل تواصل بعد</td></tr>';
+      return;
+    }
+
+    contacts.forEach(contact => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${contact.contact_type || '-'}</td>
+        <td>${contact.label_ar || contact.label_en || '-'}</td>
+        <td><a class="contact-link-preview" href="${contact.href}" target="_blank" rel="noopener">${contact.href}</a></td>
+        <td>${contact.sort_order || 1}</td>
+        <td><span class="status-badge ${contact.is_active ? 'approved' : 'rejected'}">${contact.is_active ? 'ظاهر' : 'مخفي'}</span></td>
+        <td class="action-cell">
+          <button class="fm-btn btn-edit-contact" data-id="${contact.id}">تعديل</button>
+          <button class="fm-btn btn-delete-contact" data-id="${contact.id}">حذف</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll('.btn-edit-contact').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const contact = siteContacts.find(item => item.id === btn.dataset.id);
+        if (!contact) return;
+        fillContactForm(contact);
+      });
+    });
+
+    tbody.querySelectorAll('.btn-delete-contact').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('تأكيد حذف وسيلة التواصل؟')) return;
+        btn.disabled = true;
+        const result = await bsDeleteSiteContact(btn.dataset.id);
+        if (result?.error) alert('فشل الحذف: ' + result.error.message);
+        loadDashboardData();
+      });
+    });
+  }
+
+  function fillContactForm(contact) {
+    document.getElementById('contactId').value = contact.id || '';
+    document.getElementById('contactType').value = contact.contact_type || 'custom';
+    document.getElementById('contactLabel').value = contact.label_ar || contact.label_en || '';
+    document.getElementById('contactHref').value = contact.href || '';
+    document.getElementById('contactSortOrder').value = contact.sort_order || 1;
+    document.getElementById('contactIsActive').checked = contact.is_active !== false;
+  }
+
+  function resetContactForm() {
+    if (!contactForm) return;
+    contactForm.reset();
+    document.getElementById('contactId').value = '';
+    document.getElementById('contactIsActive').checked = true;
+  }
+
+  if (contactResetBtn) {
+    contactResetBtn.addEventListener('click', resetContactForm);
+  }
+
+  if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const type = document.getElementById('contactType').value;
+      const label = document.getElementById('contactLabel').value.trim();
+      const href = document.getElementById('contactHref').value.trim();
+      const id = document.getElementById('contactId').value;
+
+      if (!href || !label) {
+        alert('اكتب الاسم والرابط أولا');
+        return;
+      }
+
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+
+      const result = await bsUpsertSiteContact({
+        id: id || undefined,
+        contact_type: type,
+        icon_key: type,
+        label_ar: label,
+        label_en: label,
+        href,
+        sort_order: Number(document.getElementById('contactSortOrder').value || 1),
+        is_active: document.getElementById('contactIsActive').checked
+      });
+
+      submitBtn.disabled = false;
+      if (result?.error) {
+        alert('فشل حفظ وسيلة التواصل: ' + result.error.message);
+        return;
+      }
+
+      resetContactForm();
+      loadDashboardData();
+    });
   }
 
   /* ==========================================
