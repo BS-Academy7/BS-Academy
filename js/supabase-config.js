@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    B&S Academy — Supabase Configuration
    ============================================
    HOW TO ACTIVATE THIS FILE (Arabic instructions
@@ -22,7 +22,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_uuUbSPlrYHLeGY0N7qWskA_2V9xJutv';
 // After deploying the Google Apps Script web app, paste its /exec URL here.
 // Keep the token empty unless you also set CONFIG.ACCESS_TOKEN in Apps Script.
 const GOOGLE_DRIVE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxNFmXzWW9VFYCjFf__WdQ9j2DW9t5qv-Y9uDezewrZTafu_4ztGc2PJxlFfBVoRANO/exec';
-const GOOGLE_DRIVE_UPLOAD_TOKEN = '';
+const GOOGLE_DRIVE_UPLOAD_TOKEN = 'bs-academy-drive-bridge-2026';
 
 const isSupabaseConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL'
   && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
@@ -40,6 +40,9 @@ const isGoogleDriveUploadConfigured = GOOGLE_DRIVE_UPLOAD_ENDPOINT
    AUTH HELPERS
    ============================================ */
 
+// SECURITY NOTE: role is NOT accepted from the frontend form.
+// All new users are treated as 'student' by default.
+// An admin must manually update the role from the dashboard after account creation.
 async function bsSignUp(email, password, fullName) {
   if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
   const { data, error } = await supabaseClient.auth.signUp({
@@ -47,8 +50,22 @@ async function bsSignUp(email, password, fullName) {
     password,
     options: { data: { full_name: fullName } }
   });
+  
+  if (!error && data?.user && isGoogleDriveUploadConfigured) {
+    // Always creates a student folder — admin changes role separately in dashboard
+    const folderPath = `01_People/02_Students/${data.user.id} - ${fullName}`;
+    const result = await bsCreateDriveFolder(folderPath);
+    if (result && result.ok) {
+      await supabaseClient.from('profiles').update({
+        drive_folder_id: result.folderId,
+        drive_folder_url: result.url
+      }).eq('id', data.user.id);
+    }
+  }
+  
   return { data, error };
 }
+
 
 async function bsSignIn(email, password) {
   if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
@@ -177,8 +194,30 @@ async function bsUploadToGoogleDrive(file, folder = 'site-content', metadata = {
     url: result.url,
     fileId: result.fileId,
     folderId: result.folderId,
-    provider: 'google-drive'
+    folderPath: result.folderPath,
+    provider: 'google-drive',
+    fileName: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    fileSize: file.size
   };
+}
+
+async function bsCreateDriveFolder(folderPath) {
+  if (!isGoogleDriveUploadConfigured) return null;
+  const response = await fetch(GOOGLE_DRIVE_UPLOAD_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      action: 'create_folder',
+      token: GOOGLE_DRIVE_UPLOAD_TOKEN,
+      folderPath: folderPath
+    })
+  });
+  try {
+    return await response.json();
+  } catch (e) {
+    return null;
+  }
 }
 
 async function bsUploadImage(file, folder = 'site-content', metadata = {}) {
@@ -197,7 +236,13 @@ async function bsUploadImage(file, folder = 'site-content', metadata = {}) {
     .from('public-assets')
     .getPublicUrl(fileName);
 
-  return { url: urlData.publicUrl };
+  return { 
+    url: urlData.publicUrl,
+    provider: 'supabase-storage',
+    fileName: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    fileSize: file.size
+  };
 }
 
 /* ============================================
@@ -208,7 +253,9 @@ async function bsSubmitOnDemandRequest(payload) {
   if (!supabaseClient) return { error: { message: 'Supabase not configured yet — request was not saved to database' } };
   const { data, error } = await supabaseClient
     .from('ondemand_requests')
-    .insert([payload]);
+    .insert([payload])
+    .select()
+    .single();
   return { data, error };
 }
 
@@ -220,6 +267,41 @@ async function bsGetAllRequests() {
     .order('created_at', { ascending: false });
   if (error) return [];
   return data || [];
+}
+
+/* ============================================
+   ACADEMY FILES (File Catalog - Phase 1)
+   ============================================ */
+
+async function bsRegisterAcademyFile(uploadResult, metadata = {}) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  
+  // Get current user if logged in to track uploaded_by
+  const user = await bsGetCurrentUser();
+  
+  const payload = {
+    drive_file_id: uploadResult.fileId,
+    drive_folder_id: uploadResult.folderId,
+    drive_url: uploadResult.url,
+    file_name: uploadResult.fileName || metadata.fileName || 'unknown',
+    mime_type: uploadResult.mimeType || metadata.mimeType,
+    file_size: uploadResult.fileSize || metadata.fileSize,
+    provider: uploadResult.provider || 'google-drive',
+    entity_type: metadata.entityType,
+    entity_id: metadata.entityId,
+    category: metadata.category,
+    folder_path: metadata.folderPath || uploadResult.folderPath,
+    visibility_scope: metadata.visibilityScope || 'restricted',
+    uploaded_by: user ? user.id : null,
+  };
+
+  const { data, error } = await supabaseClient
+    .from('academy_files')
+    .insert([payload])
+    .select()
+    .single();
+
+  return { data, error };
 }
 
 /* ============================================
@@ -283,6 +365,27 @@ async function bsAddProgram({ parentId, sectorKey, titleAr, titleEn, descAr, des
       sort_order: sortOrder || 0
     }])
     .select();
+    
+  if (!error && data && data.length > 0 && isGoogleDriveUploadConfigured) {
+    // Create folder automatically (Phase 4)
+    const programId = data[0].id;
+    const folderPath = `02_Programs/${sectorKey}/${titleEn || titleAr}`;
+    const result = await bsCreateDriveFolder(folderPath);
+    if (result && result.ok) {
+      // Subfolders
+      await bsCreateDriveFolder(`${folderPath}/00_Banners`);
+      await bsCreateDriveFolder(`${folderPath}/01_Materials`);
+      await bsCreateDriveFolder(`${folderPath}/02_Assignments`);
+      await bsCreateDriveFolder(`${folderPath}/03_Submissions`);
+      
+      // Save folder ID
+      await supabaseClient.from('programs').update({ 
+        drive_folder_id: result.folderId,
+        drive_folder_url: result.url 
+      }).eq('id', programId);
+    }
+  }
+  
   return { data, error };
 }
 
