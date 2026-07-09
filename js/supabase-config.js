@@ -240,6 +240,60 @@ async function bsUpdateSiteContent(key, { ar, en, image_url }) {
   return { data, error };
 }
 
+/* ============================================
+   SITE CONTACTS (Admin-editable contact links)
+   ============================================ */
+
+async function bsGetSiteContacts(includeInactive = false) {
+  if (!supabaseClient) return [];
+  let query = supabaseClient
+    .from('site_contacts')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (!includeInactive) query = query.eq('is_active', true);
+
+  const { data, error } = await query;
+  if (error) {
+    console.warn('[B&S] Could not load site contacts', error);
+    return [];
+  }
+  return data || [];
+}
+
+async function bsUpsertSiteContact(contact) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const payload = {
+    contact_type: contact.contact_type,
+    label_ar: contact.label_ar || contact.label || contact.contact_type,
+    label_en: contact.label_en || contact.label || contact.contact_type,
+    href: contact.href,
+    icon_key: contact.icon_key || contact.contact_type,
+    sort_order: Number(contact.sort_order || 1),
+    is_active: contact.is_active !== false,
+    updated_at: new Date().toISOString()
+  };
+  if (contact.id) payload.id = contact.id;
+
+  const { data, error } = await supabaseClient
+    .from('site_contacts')
+    .upsert([payload])
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+async function bsDeleteSiteContact(contactId) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const { data, error } = await supabaseClient
+    .from('site_contacts')
+    .delete()
+    .eq('id', contactId);
+  return { data, error };
+}
+
 function bsFileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
