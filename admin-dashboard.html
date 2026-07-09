@@ -7,12 +7,13 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="images/logo.png" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260709-identity-v1" />
+  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260710-contacts-v1" />
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-config.js?v=20260709-identity-v1"></script>
+  <script src="js/supabase-config.js?v=20260710-contacts-v1"></script>
 </head>
 <body class="admin-body">
   
@@ -20,6 +21,7 @@
   <div id="adminLoginGate" class="admin-gate">
     <div class="admin-gate-card">
       <div class="academy-logo">
+        <img src="images/logo.png" alt="B&S Academy" class="admin-brand-logo">
         <span class="logo-text">B&S <span>Academy</span></span>
       </div>
       <h2>بوابة الإدارة العليا</h2>
@@ -34,6 +36,7 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar">
       <div class="sidebar-header">
+        <img src="images/logo.png" alt="B&S Academy" class="admin-sidebar-logo">
         <span class="logo-text">B&S <span>Dashboard</span></span>
       </div>
       <nav class="sidebar-nav">
@@ -48,6 +51,10 @@
         <a href="#files" class="nav-item" data-tab="files">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
           إدارة الملفات
+        </a>
+        <a href="#contacts" class="nav-item" data-tab="contacts">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.91.33 1.8.62 2.65a2 2 0 0 1-.45 2.11L8 9.75a16 16 0 0 0 6.25 6.25l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.74.5 2.65.62A2 2 0 0 1 22 16.92z"></path></svg>
+          وسائل التواصل
         </a>
       </nav>
       <div class="sidebar-footer">
@@ -119,6 +126,72 @@
             </div>
           </div>
         </div>
+
+        <!-- Contacts View -->
+        <div id="view-contacts" class="admin-view">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>وسائل التواصل</h2>
+                <p>إدارة أيقونات وروابط التواصل التي تظهر في فوتر الأكاديمية.</p>
+              </div>
+            </div>
+
+            <form id="contactForm" class="contact-admin-form">
+              <input type="hidden" id="contactId">
+              <label>
+                النوع
+                <select id="contactType" required>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="telegram">Telegram</option>
+                  <option value="email">Email</option>
+                  <option value="phone">Phone</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <label>
+                الاسم الظاهر
+                <input type="text" id="contactLabel" required placeholder="مثال: WhatsApp">
+              </label>
+              <label>
+                الرابط / القيمة
+                <input type="text" id="contactHref" required placeholder="https://t.me/... أو https://wa.me/...">
+              </label>
+              <label>
+                الترتيب
+                <input type="number" id="contactSortOrder" value="1" min="1">
+              </label>
+              <label class="contact-active-row">
+                <input type="checkbox" id="contactIsActive" checked>
+                ظاهر في الموقع
+              </label>
+              <div class="contact-form-actions">
+                <button type="submit" class="btn btn-primary">حفظ وسيلة التواصل</button>
+                <button type="button" id="contactResetBtn" class="btn btn-outline">إلغاء التعديل</button>
+              </div>
+            </form>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>النوع</th>
+                    <th>الاسم</th>
+                    <th>الرابط</th>
+                    <th>الترتيب</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="contactsTableBody">
+                  <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
         
         <!-- Files View (Drive Tree Manager) -->
         <div id="view-files" class="admin-view">
@@ -170,6 +243,6 @@
     </div>
   </div>
 
-  <script src="js/admin-dashboard.js?v=20260709-identity-v1"></script>
+  <script src="js/admin-dashboard.js?v=20260710-contacts-v1"></script>
 </body>
 </html>
