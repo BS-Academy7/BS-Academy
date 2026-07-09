@@ -40,25 +40,44 @@ const isGoogleDriveUploadConfigured = GOOGLE_DRIVE_UPLOAD_ENDPOINT
    AUTH HELPERS
    ============================================ */
 
-// SECURITY NOTE: role is NOT accepted from the frontend form.
-// All new users are treated as 'student' by default.
-// An admin must manually update the role from the dashboard after account creation.
-async function bsSignUp(email, password, fullName) {
+// SECURITY NOTE: privileged roles are NOT accepted from the frontend form.
+// Users can request an account type, but admins/super admins grant real permissions.
+async function bsSignUp(email, password, fullName, options = {}) {
   if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const accountType = ['student', 'instructor', 'staff'].includes(options.accountType)
+    ? options.accountType
+    : 'student';
+
   const { data, error } = await supabaseClient.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } }
+    options: {
+      data: {
+        full_name: fullName,
+        whatsapp: options.whatsapp || '',
+        account_type: accountType,
+        desired_position: options.desiredPosition || '',
+        specialty: options.specialty || ''
+      }
+    }
   });
   
   if (!error && data?.user && isGoogleDriveUploadConfigured) {
-    // Always creates a student folder — admin changes role separately in dashboard
-    const folderPath = `01_People/02_Students/${data.user.id} - ${fullName}`;
+    const peopleFolder = accountType === 'instructor'
+      ? '03_Instructors'
+      : accountType === 'staff'
+        ? '04_Staff'
+        : '02_Students';
+    const folderPath = `01_People/${peopleFolder}/${data.user.id} - ${fullName}`;
     const result = await bsCreateDriveFolder(folderPath);
     if (result && result.ok) {
       await supabaseClient.from('profiles').update({
         drive_folder_id: result.folderId,
-        drive_folder_url: result.url
+        drive_folder_url: result.url,
+        account_type: accountType,
+        desired_position: options.desiredPosition || null,
+        specialty: options.specialty || null,
+        whatsapp: options.whatsapp || null
       }).eq('id', data.user.id);
     }
   }
@@ -93,6 +112,80 @@ async function bsGetProfile(userId) {
     .single();
   if (error) return null;
   return data;
+}
+
+async function bsEnsureOnboardingApplication(userId, payload = {}) {
+  if (!supabaseClient || !userId) return { error: { message: 'Supabase not configured yet' } };
+  const accountType = ['student', 'instructor', 'staff'].includes(payload.accountType)
+    ? payload.accountType
+    : 'student';
+
+  const { data, error } = await supabaseClient
+    .from('onboarding_applications')
+    .upsert([{
+      user_id: userId,
+      account_type: accountType,
+      desired_position: payload.desiredPosition || null,
+      specialty: payload.specialty || null,
+      current_stage_key: 'complete_profile',
+      status: 'needs_profile'
+    }], { onConflict: 'user_id' })
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+async function bsGetOnboardingApplications() {
+  if (!supabaseClient) return [];
+  const { data, error } = await supabaseClient
+    .from('onboarding_applications')
+    .select('*, profiles(full_name, whatsapp, role, account_type)')
+    .order('submitted_at', { ascending: false });
+  if (error) {
+    console.warn('[B&S] Could not load onboarding applications', error);
+    return [];
+  }
+  return data || [];
+}
+
+async function bsUpdateOnboardingApplication(applicationId, patch) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const { data, error } = await supabaseClient
+    .from('onboarding_applications')
+    .update({
+      ...patch,
+      reviewed_at: new Date().toISOString()
+    })
+    .eq('id', applicationId)
+    .select()
+    .single();
+  return { data, error };
+}
+
+async function bsApproveOnboardingApplication(application) {
+  if (!supabaseClient || !application) return { error: { message: 'Missing application' } };
+  const currentUser = await bsGetCurrentUser();
+  const role = application.account_type === 'instructor' ? 'instructor' : 'student';
+
+  const { error: profileError } = await supabaseClient
+    .from('profiles')
+    .update({
+      role,
+      account_type: application.account_type,
+      onboarding_status: 'approved',
+      approved_at: new Date().toISOString(),
+      approved_by: currentUser ? currentUser.id : null
+    })
+    .eq('id', application.user_id);
+
+  if (profileError) return { error: profileError };
+
+  return bsUpdateOnboardingApplication(application.id, {
+    status: 'approved',
+    current_stage_key: 'approved',
+    reviewed_by: currentUser ? currentUser.id : null
+  });
 }
 
 /* ============================================
