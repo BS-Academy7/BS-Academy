@@ -28,6 +28,27 @@ returns boolean as $$
   );
 $$ language sql security definer set search_path = public;
 
+create or replace function public.bs_current_profile_role()
+returns text as $$
+  select role
+  from public.profiles
+  where id = auth.uid();
+$$ language sql security definer set search_path = public;
+
+create or replace function public.bs_current_profile_account_type()
+returns text as $$
+  select account_type
+  from public.profiles
+  where id = auth.uid();
+$$ language sql security definer set search_path = public;
+
+create or replace function public.bs_current_profile_onboarding_status()
+returns text as $$
+  select onboarding_status
+  from public.profiles
+  where id = auth.uid();
+$$ language sql security definer set search_path = public;
+
 create table if not exists public.onboarding_stage_templates (
   id uuid default gen_random_uuid() primary key,
   account_type text not null,
@@ -145,6 +166,17 @@ drop policy if exists "Admins can view profiles" on public.profiles;
 create policy "Admins can view profiles"
   on public.profiles for select
   using (public.bs_is_admin(array['admin','super_admin','drive_manager']));
+
+drop policy if exists "Users can update their own profile" on public.profiles;
+create policy "Users can update their own non-privileged profile"
+  on public.profiles for update
+  using (auth.uid() = id)
+  with check (
+    auth.uid() = id
+    and role = public.bs_current_profile_role()
+    and coalesce(account_type, 'student') = coalesce(public.bs_current_profile_account_type(), 'student')
+    and coalesce(onboarding_status, 'needs_profile') = coalesce(public.bs_current_profile_onboarding_status(), 'needs_profile')
+  );
 
 drop policy if exists "Admins can update profiles" on public.profiles;
 create policy "Admins can update profiles"
