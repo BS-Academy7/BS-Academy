@@ -18,6 +18,12 @@
 const SUPABASE_URL = 'https://wwgtprdveknjclflhqaa.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_uuUbSPlrYHLeGY0N7qWskA_2V9xJutv';
 
+// Google Drive upload bridge.
+// After deploying the Google Apps Script web app, paste its /exec URL here.
+// Keep the token empty unless you also set CONFIG.ACCESS_TOKEN in Apps Script.
+const GOOGLE_DRIVE_UPLOAD_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxNFmXzWW9VFYCjFf__WdQ9j2DW9t5qv-Y9uDezewrZTafu_4ztGc2PJxlFfBVoRANO/exec';
+const GOOGLE_DRIVE_UPLOAD_TOKEN = '';
+
 const isSupabaseConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL'
   && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
 
@@ -26,6 +32,9 @@ let supabaseClient = null;
 if (isSupabaseConfigured && typeof window.supabase !== 'undefined') {
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
+
+const isGoogleDriveUploadConfigured = GOOGLE_DRIVE_UPLOAD_ENDPOINT
+  && GOOGLE_DRIVE_UPLOAD_ENDPOINT !== 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL';
 
 /* ============================================
    AUTH HELPERS
@@ -121,7 +130,62 @@ async function bsUpdateSiteContent(key, { ar, en, image_url }) {
   return { data, error };
 }
 
-async function bsUploadImage(file, folder = 'site-content') {
+function bsFileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = String(reader.result || '');
+      resolve(result.includes(',') ? result.split(',')[1] : result);
+    };
+    reader.onerror = () => reject(reader.error || new Error('Could not read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function bsUploadToGoogleDrive(file, folder = 'site-content', metadata = {}) {
+  if (!isGoogleDriveUploadConfigured) {
+    return { error: { message: 'Google Drive upload endpoint is not configured yet' } };
+  }
+
+  const base64 = await bsFileToBase64(file);
+  const response = await fetch(GOOGLE_DRIVE_UPLOAD_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({
+      token: GOOGLE_DRIVE_UPLOAD_TOKEN,
+      folder,
+      fileName: file.name,
+      mimeType: file.type || 'application/octet-stream',
+      size: file.size,
+      base64,
+      metadata
+    })
+  });
+
+  let result = null;
+  try {
+    result = await response.json();
+  } catch (error) {
+    return { error: { message: 'Google Drive upload returned an unreadable response' } };
+  }
+
+  if (!response.ok || !result || result.ok === false) {
+    return { error: { message: result?.error || 'Google Drive upload failed' } };
+  }
+
+  return {
+    url: result.url,
+    fileId: result.fileId,
+    folderId: result.folderId,
+    provider: 'google-drive'
+  };
+}
+
+async function bsUploadImage(file, folder = 'site-content', metadata = {}) {
+  if (isGoogleDriveUploadConfigured) {
+    return bsUploadToGoogleDrive(file, folder, metadata);
+  }
+
   if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
   const fileName = `${folder}/${Date.now()}-${file.name}`;
   const { data, error } = await supabaseClient.storage
