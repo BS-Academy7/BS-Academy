@@ -9,33 +9,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260709-drive-v5" />
+  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260709-identity-v1" />
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="js/supabase-config.js?v=20260709-drive-v5"></script>
+  <script src="js/supabase-config.js?v=20260709-identity-v1"></script>
 </head>
 <body class="admin-body">
   
-  <!-- Login Gate -->
+  <!-- Unified Account Gate -->
   <div id="adminLoginGate" class="admin-gate">
     <div class="admin-gate-card">
       <div class="academy-logo">
         <span class="logo-text">B&S <span>Academy</span></span>
       </div>
-      <h2>تسجيل دخول الإدارة</h2>
-      <p>هذه الصفحة مخصصة لمديري النظام فقط.</p>
-      <form id="adminLoginForm">
-        <div class="form-group">
-          <label>البريد الإلكتروني</label>
-          <input type="email" id="adminEmail" required>
-        </div>
-        <div class="form-group">
-          <label>كلمة المرور</label>
-          <input type="password" id="adminPassword" required>
-        </div>
-        <button type="submit" class="btn btn-primary">تسجيل الدخول</button>
-        <p id="adminLoginError" class="error-message"></p>
-      </form>
+      <h2>بوابة الإدارة العليا</h2>
+      <p>سجّل دخولك من بوابة الحسابات الموحدة، وسيتم توجيه أصحاب الصلاحيات تلقائيا للوحة التحكم.</p>
+      <a class="btn btn-primary gate-auth-link" href="auth.html?next=admin-dashboard.html">الدخول من بوابة الحسابات</a>
+      <p id="adminLoginError" class="error-message"></p>
     </div>
   </div>
 
@@ -50,6 +40,10 @@
         <a href="#requests" class="nav-item active" data-tab="requests">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           طلبات On-Demand
+        </a>
+        <a href="#onboarding" class="nav-item" data-tab="onboarding">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m16 11 2 2 4-4"></path></svg>
+          التسجيلات والمراحل
         </a>
         <a href="#files" class="nav-item" data-tab="files">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
@@ -90,6 +84,36 @@
                 </thead>
                 <tbody id="requestsTableBody">
                   <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Onboarding View -->
+        <div id="view-onboarding" class="admin-view">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>طلبات التسجيل الجديدة</h2>
+                <p>قبول مباشر، نقل مرحلة، أو متابعة استكمال البيانات حسب نوع الحساب.</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>تاريخ التسجيل</th>
+                    <th>المستخدم</th>
+                    <th>نوع الحساب</th>
+                    <th>التخصص / البوزيشن</th>
+                    <th>المرحلة الحالية</th>
+                    <th>الحالة</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="onboardingTableBody">
+                  <tr><td colspan="7" class="loading-cell">جاري التحميل...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -146,6 +170,6 @@
     </div>
   </div>
 
-  <script src="js/admin-dashboard.js?v=20260709-drive-v5"></script>
+  <script src="js/admin-dashboard.js?v=20260709-identity-v1"></script>
 </body>
 </html>
