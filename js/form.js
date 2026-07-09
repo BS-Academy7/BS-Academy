@@ -183,11 +183,30 @@
       deadline_date: formData.get('deadline_date') || null
     };
 
-    // Upload attachments to Supabase Storage if configured, else just note count
+    // Upload attachments through the configured file bridge, then save the returned links.
     let attachmentUrls = [];
     if (typeof bsUploadImage === 'function' && uploadedFiles.length) {
       for (const file of uploadedFiles) {
-        const result = await bsUploadImage(file, 'ondemand-attachments');
+        const result = await bsUploadImage(file, 'ondemand-attachments', {
+          requestType: 'ondemand',
+          studentName: payload.full_name,
+          studentId: payload.email || payload.whatsapp,
+          whatsapp: payload.whatsapp,
+          email: payload.email,
+          subjectName: payload.subject_name,
+          topicTitle: payload.topic_title,
+          academicLevel: payload.academic_level
+        });
+        if (result.error) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = currentLang === 'ar' ? 'إرسال الطلب' : 'Submit Request';
+          const msg = currentLang === 'ar'
+            ? `حصل خطأ أثناء رفع الملف ${file.name}:\n${result.error.message || result.error}`
+            : `An error occurred while uploading ${file.name}:\n${result.error.message || result.error}`;
+          alert(msg);
+          showToast(currentLang === 'ar' ? '❌ فشل رفع المرفقات' : '❌ Attachment upload failed', true);
+          return;
+        }
         if (result.url) attachmentUrls.push(result.url);
       }
     }
