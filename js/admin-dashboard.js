@@ -5,31 +5,16 @@
 document.addEventListener('DOMContentLoaded', async () => {
   const loginGate = document.getElementById('adminLoginGate');
   const adminLayout = document.getElementById('adminLayout');
-  const loginForm = document.getElementById('adminLoginForm');
   const loginError = document.getElementById('adminLoginError');
   const userInfo = document.getElementById('adminUserInfo');
   const logoutBtn = document.getElementById('adminLogoutBtn');
   
   let currentAdminProfile = null;
   let allAcademyFiles = [];
+  let onboardingApplications = [];
 
   // Check initial auth state
   await checkAuth();
-
-  // Login form handler
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    loginError.textContent = 'جاري تسجيل الدخول...';
-    const email = document.getElementById('adminEmail').value;
-    const pass = document.getElementById('adminPassword').value;
-    
-    const { data, error } = await bsSignIn(email, pass);
-    if (error) {
-      loginError.textContent = 'خطأ في بيانات الدخول';
-      return;
-    }
-    await checkAuth();
-  });
 
   // Logout
   logoutBtn.addEventListener('click', async () => {
@@ -47,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profile = await bsGetProfile(user.id);
     const allowedRoles = ['admin', 'super_admin', 'drive_manager'];
     if (!profile || !allowedRoles.includes(profile.role)) {
-      loginError.textContent = 'عذراً، هذا الحساب لا يملك صلاحيات الإدارة.';
+      loginError.textContent = 'هذا الحساب لا يملك صلاحيات الإدارة. اطلب ترقية الصلاحية من الإدارة العليا.';
       await bsSignOut();
       showLoginGate();
       return;
@@ -78,6 +63,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   function applyRoleVisibility(role) {
     const filesNav = document.querySelector('.nav-item[data-tab="files"]');
     if (filesNav) filesNav.style.display = canManageDrive(role) ? 'flex' : 'none';
+    const onboardingNav = document.querySelector('.nav-item[data-tab="onboarding"]');
+    if (onboardingNav) onboardingNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
   }
 
   /* ==========================================
@@ -107,12 +94,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     // We fetch requests and files.
     // In a real huge system we'd paginate, but for now we fetch all.
     const requests = await bsGetAllRequests();
+    onboardingApplications = typeof bsGetOnboardingApplications === 'function'
+      ? await bsGetOnboardingApplications()
+      : [];
     
     // Fetch all academy_files
     const { data: filesData } = await supabaseClient.from('academy_files').select('*');
     allAcademyFiles = filesData || [];
 
     renderRequests(requests);
+    renderOnboardingApplications(onboardingApplications);
   }
 
   function renderRequests(requests) {
@@ -161,6 +152,130 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
       tbody.appendChild(tr);
     });
+  }
+
+  function renderOnboardingApplications(applications) {
+    const tbody = document.getElementById('onboardingTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!applications || applications.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">لا توجد تسجيلات جديدة حالياً</td></tr>';
+      return;
+    }
+
+    applications.forEach(app => {
+      const profile = app.profiles || {};
+      const tr = document.createElement('tr');
+      const date = new Date(app.submitted_at).toLocaleDateString('ar-EG');
+      const typeLabel = app.account_type === 'instructor'
+        ? 'محاضر'
+        : app.account_type === 'staff'
+          ? 'بوزيشن / فريق'
+          : 'طالب';
+
+      tr.innerHTML = `
+        <td>${date}</td>
+        <td>
+          <strong>${profile.full_name || 'مستخدم جديد'}</strong><br>
+          <small>${profile.whatsapp || ''}</small>
+        </td>
+        <td>${typeLabel}</td>
+        <td>
+          ${app.specialty || '-'}<br>
+          <small>${app.desired_position || ''}</small>
+        </td>
+        <td>${formatStage(app.current_stage_key)}</td>
+        <td><span class="status-badge ${app.status}">${formatStatus(app.status)}</span></td>
+        <td class="action-cell">
+          <button class="fm-btn btn-next-stage" data-id="${app.id}">مرحلة تالية</button>
+          <button class="fm-btn btn-approve" data-id="${app.id}">قبول مباشر</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll('.btn-next-stage').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const app = onboardingApplications.find(item => item.id === btn.dataset.id);
+        if (!app) return;
+        const next = getNextStage(app);
+        btn.disabled = true;
+        if (next.stage === 'approved') {
+          await bsApproveOnboardingApplication(app);
+        } else {
+          await bsUpdateOnboardingApplication(app.id, {
+            current_stage_key: next.stage,
+            status: next.status
+          });
+        }
+        loadDashboardData();
+      });
+    });
+
+    tbody.querySelectorAll('.btn-approve').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const app = onboardingApplications.find(item => item.id === btn.dataset.id);
+        if (!app) return;
+        if (!confirm('تأكيد قبول هذا الحساب مباشرة؟')) return;
+        btn.disabled = true;
+        const result = await bsApproveOnboardingApplication(app);
+        if (result?.error) alert('فشل القبول: ' + result.error.message);
+        loadDashboardData();
+      });
+    });
+  }
+
+  function formatStage(stage) {
+    const map = {
+      complete_profile: 'استكمال بيانات',
+      documents: 'رفع مستندات',
+      technical_test: 'اختبار فني',
+      interview: 'مقابلة',
+      final_review: 'مراجعة نهائية',
+      permission_review: 'مراجعة صلاحيات',
+      approved: 'مقبول'
+    };
+    return map[stage] || stage || '-';
+  }
+
+  function formatStatus(status) {
+    const map = {
+      needs_profile: 'ناقص بيانات',
+      in_review: 'تحت المراجعة',
+      pending_documents: 'مطلوب مستندات',
+      pending_test: 'اختبار',
+      pending_interview: 'مقابلة',
+      approved: 'مقبول',
+      rejected: 'مرفوض'
+    };
+    return map[status] || status || '-';
+  }
+
+  function getNextStage(app) {
+    const flows = {
+      student: [
+        ['complete_profile', 'needs_profile'],
+        ['approved', 'approved']
+      ],
+      instructor: [
+        ['complete_profile', 'needs_profile'],
+        ['documents', 'pending_documents'],
+        ['technical_test', 'pending_test'],
+        ['interview', 'pending_interview'],
+        ['final_review', 'in_review'],
+        ['approved', 'approved']
+      ],
+      staff: [
+        ['complete_profile', 'needs_profile'],
+        ['permission_review', 'in_review'],
+        ['approved', 'approved']
+      ]
+    };
+    const flow = flows[app.account_type] || flows.student;
+    const index = flow.findIndex(([stage]) => stage === app.current_stage_key);
+    const next = flow[Math.min(index + 1, flow.length - 1)] || flow[0];
+    return { stage: next[0], status: next[1] };
   }
 
   /* ==========================================
