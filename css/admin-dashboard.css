@@ -1,0 +1,378 @@
+/* ============================================
+   B&S Academy - Master Dashboard Styles
+   ============================================ */
+
+body.admin-body {
+  margin: 0;
+  padding: 0;
+  background-color: #f5f7fa;
+  font-family: 'Cairo', sans-serif;
+  color: #333;
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---- Login Gate ---- */
+.admin-gate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.admin-gate-card {
+  background: #fff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.admin-gate-card h2 {
+  margin: 20px 0 10px;
+  font-size: 24px;
+}
+
+.admin-gate-card p {
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.admin-gate-card .form-group {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.admin-gate-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 5px;
+}
+
+.admin-gate-card .btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  background: #007bff;
+  color: white;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.admin-gate-card .btn:hover {
+  background: #0056b3;
+}
+
+/* ---- Main Layout ---- */
+.admin-layout {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.admin-sidebar {
+  width: 260px;
+  background: #fff;
+  border-left: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+}
+
+.sidebar-header {
+  padding: 24px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.sidebar-header .logo-text {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  color: #1a1a1a;
+}
+.sidebar-header .logo-text span {
+  color: #007bff;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 24px;
+  color: #555;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.2s;
+  border-right: 4px solid transparent;
+}
+
+.nav-item svg {
+  margin-left: 12px;
+  opacity: 0.7;
+}
+
+.nav-item:hover, .nav-item.active {
+  background: #f8f9fa;
+  color: #007bff;
+  border-right-color: #007bff;
+}
+
+.nav-item.active svg {
+  opacity: 1;
+}
+
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.admin-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.admin-topbar {
+  background: #fff;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.admin-topbar h1 {
+  margin: 0;
+  font-size: 22px;
+  color: #333;
+}
+
+.admin-views {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+.admin-view {
+  display: none;
+}
+
+.admin-view.active {
+  display: block;
+}
+
+/* ---- Cards & Tables ---- */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+  padding: 15px;
+  text-align: right;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.admin-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+
+.admin-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e0e0e0;
+  color: #333;
+}
+.status-badge.new { background: #e3f2fd; color: #1976d2; }
+
+.attachment-btn {
+  background: #f0f4f8;
+  border: 1px solid #cce4f7;
+  color: #007bff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 5px;
+  transition: 0.2s;
+}
+.attachment-btn:hover {
+  background: #d9eaf7;
+}
+
+/* ---- File Viewer Modal ---- */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.modal.active {
+  display: flex;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h3 { margin: 0; }
+.close-modal { font-size: 24px; cursor: pointer; color: #888; }
+.close-modal:hover { color: #333; }
+
+.modal-body {
+  padding: 20px;
+}
+.fv-metadata p { margin: 10px 0; font-size: 15px; }
+.fv-actions { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ---- Drive Tree Manager ---- */
+.file-manager-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+.fm-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+.fm-breadcrumb {
+  display: flex;
+  gap: 5px;
+  font-size: 16px;
+}
+.fm-crumb {
+  cursor: pointer;
+  color: #007bff;
+  font-weight: 600;
+}
+.fm-crumb:hover {
+  text-decoration: underline;
+}
+.fm-crumb::after {
+  content: "/";
+  margin: 0 5px;
+  color: #888;
+  display: inline-block;
+}
+.fm-crumb:last-child::after {
+  content: "";
+}
+.fm-crumb.active {
+  color: #333;
+  cursor: default;
+  text-decoration: none;
+}
+.fm-actions {
+  display: flex;
+  gap: 10px;
+}
+.fm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+}
+.fm-item {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: center;
+  transition: 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+.fm-item:hover {
+  background: #f8f9fa;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border-color: #ddd;
+}
+.fm-item.archived {
+  opacity: 0.6;
+}
+.fm-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+.fm-name {
+  font-size: 14px;
+  font-weight: 600;
+  word-break: break-word;
+  margin-bottom: 10px;
+}
+.fm-item-actions {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.fm-btn {
+  background: #eee;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.fm-btn:hover {
+  background: #ddd;
+}
+.fm-loading {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 16px;
+}
+
