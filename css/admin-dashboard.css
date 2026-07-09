@@ -71,6 +71,13 @@ body.admin-body {
   background: #0056b3;
 }
 
+.gate-auth-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
 /* ---- Main Layout ---- */
 .admin-layout {
   display: flex;
@@ -186,6 +193,24 @@ body.admin-body {
   margin-bottom: 20px;
 }
 
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.section-head h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.section-head p {
+  margin: 0;
+  color: #667085;
+}
+
 .table-responsive {
   overflow-x: auto;
 }
@@ -222,6 +247,24 @@ body.admin-body {
   color: #333;
 }
 .status-badge.new { background: #e3f2fd; color: #1976d2; }
+.status-badge.needs_profile { background: #fff7e6; color: #a15c00; }
+.status-badge.in_review,
+.status-badge.pending_documents,
+.status-badge.pending_test,
+.status-badge.pending_interview { background: #eef4ff; color: #175cd3; }
+.status-badge.approved { background: #e7f8ef; color: #087443; }
+.status-badge.rejected { background: #fdecec; color: #b42318; }
+
+.action-cell {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-approve {
+  background: #0a66c2;
+  color: #fff;
+}
 
 .attachment-btn {
   background: #f0f4f8;
