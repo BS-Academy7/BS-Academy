@@ -172,8 +172,53 @@
     `).join('');
   }
 
+  const contactIcons = {
+    whatsapp: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 6.32A8.86 8.86 0 0 0 12.05 4a8.94 8.94 0 0 0-7.74 13.4L3 21l3.73-1.27a8.9 8.9 0 0 0 5.32 1.7h.01a8.94 8.94 0 0 0 8.93-8.93 8.86 8.86 0 0 0-2.39-6.18z"/></svg>',
+    telegram: '<span class="contact-icon-text">T</span>',
+    email: '<span class="contact-icon-text">@</span>',
+    phone: '<span class="contact-icon-text">☎</span>',
+    facebook: '<span class="contact-icon-text">f</span>',
+    instagram: '<span class="contact-icon-text">◎</span>',
+    custom: '<span class="contact-icon-text">↗</span>'
+  };
+
+  function contactLabel(contact) {
+    if (!contact) return '';
+    if (typeof currentLang !== 'undefined' && currentLang === 'en') {
+      return contact.label_en || contact.label_ar || contact.contact_type;
+    }
+    return contact.label_ar || contact.label_en || contact.contact_type;
+  }
+
+  async function renderSiteContacts() {
+    if (typeof bsGetSiteContacts !== 'function') return;
+    const contacts = await bsGetSiteContacts(false);
+    if (!contacts.length) return;
+
+    const iconWrap = document.querySelector('[data-site-contact-icons]');
+    const listWrap = document.querySelector('[data-site-contact-list]');
+
+    if (iconWrap) {
+      iconWrap.innerHTML = contacts.map(contact => {
+        const type = contact.icon_key || contact.contact_type || 'custom';
+        const icon = contactIcons[type] || contactIcons.custom;
+        const label = contactLabel(contact);
+        return `<a href="${contact.href}" aria-label="${label}" title="${label}" target="_blank" rel="noopener">${icon}</a>`;
+      }).join('');
+    }
+
+    if (listWrap) {
+      listWrap.innerHTML = contacts.map(contact => {
+        const label = contactLabel(contact);
+        return `<a class="footer-contact-link" href="${contact.href}" target="_blank" rel="noopener">${label}</a>`;
+      }).join('');
+    }
+  }
+
   /* ---- Restore session on page load (if any) ---- */
   document.addEventListener('DOMContentLoaded', async () => {
+    renderSiteContacts();
+
     const session = sessionStorage.getItem('bs_session');
     if (!session) return;
 
