@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B&S Academy - Account Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/auth.css?v=20260709-identity-v1" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js?v=20260709-identity-v1"></script>
+</head>
+<body class="auth-body">
+  <main class="auth-shell">
+    <section class="auth-panel">
+      <div class="auth-brand">
+        <img src="images/logo.png" alt="B&S Academy" class="auth-logo">
+        <div>
+          <p class="brand-kicker">B&S Academy</p>
+          <h1>بوابة حسابات الأكاديمية</h1>
+        </div>
+      </div>
+
+      <div class="auth-tabs" role="tablist" aria-label="Account access">
+        <button type="button" class="auth-tab active" data-auth-tab="login">تسجيل دخول</button>
+        <button type="button" class="auth-tab" data-auth-tab="signup">حساب جديد</button>
+      </div>
+
+      <form id="loginForm" class="auth-form active" data-auth-view="login">
+        <label>
+          البريد الإلكتروني
+          <input type="email" id="loginEmail" autocomplete="email" required>
+        </label>
+        <label>
+          كلمة المرور
+          <input type="password" id="loginPassword" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="auth-submit">دخول</button>
+        <p id="loginMessage" class="auth-message"></p>
+      </form>
+
+      <form id="signupForm" class="auth-form" data-auth-view="signup">
+        <div class="account-types" aria-label="نوع الحساب">
+          <label class="type-card active">
+            <input type="radio" name="accountType" value="student" checked>
+            <span>طالب</span>
+            <small>تسجيل سريع ثم استكمال بيانات.</small>
+          </label>
+          <label class="type-card">
+            <input type="radio" name="accountType" value="instructor">
+            <span>محاضر</span>
+            <small>بيانات، مرفقات، اختبار، مقابلة، قبول.</small>
+          </label>
+          <label class="type-card">
+            <input type="radio" name="accountType" value="staff">
+            <span>بوزيشن / فريق</span>
+            <small>يحتاج موافقة وصلاحيات من الإدارة العليا.</small>
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            الاسم الكامل
+            <input type="text" id="signupName" autocomplete="name" required>
+          </label>
+          <label>
+            البريد الإلكتروني
+            <input type="email" id="signupEmail" autocomplete="email" required>
+          </label>
+          <label>
+            كلمة المرور
+            <input type="password" id="signupPassword" autocomplete="new-password" minlength="6" required>
+          </label>
+          <label>
+            واتساب
+            <input type="tel" id="signupWhatsapp" autocomplete="tel">
+          </label>
+          <label>
+            التخصص
+            <input type="text" id="signupSpecialty" placeholder="مثال: Automation, Accounting, English">
+          </label>
+          <label id="desiredPositionWrap">
+            البوزيشن المطلوب
+            <input type="text" id="signupPosition" placeholder="محاضر، منسق، دعم فني...">
+          </label>
+        </div>
+
+        <div class="stage-preview" id="stagePreview">
+          <strong>مسار التسجيل:</strong>
+          <span id="stagePreviewText">حساب جديد، استكمال بيانات، تفعيل حساب الطالب.</span>
+        </div>
+
+        <button type="submit" class="auth-submit">إنشاء الحساب</button>
+        <p id="signupMessage" class="auth-message"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="js/auth.js?v=20260709-identity-v1"></script>
+</body>
+</html>
