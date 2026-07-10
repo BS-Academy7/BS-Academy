@@ -10,7 +10,7 @@ body.auth-body {
 
 .phone-combo {
   display: grid;
-  grid-template-columns: minmax(120px, 0.9fr) auto minmax(160px, 1.1fr);
+  grid-template-columns: minmax(220px, 1fr);
   gap: 8px;
   align-items: end;
 }
@@ -20,8 +20,21 @@ body.auth-body {
   min-width: 0;
 }
 
+.phone-combo--locked {
+  grid-template-columns: minmax(220px, 1fr);
+}
+
+.phone-combo--locked > select[data-country-select] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .phone-combo .dial-code {
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   min-height: 44px;
@@ -31,6 +44,12 @@ body.auth-body {
   background: rgba(255, 255, 255, 0.8);
   color: #0f172a;
   direction: ltr;
+  font-weight: 700;
+}
+
+.phone-combo [data-local-phone] {
+  direction: ltr;
+  text-align: left;
   font-weight: 700;
 }
 
