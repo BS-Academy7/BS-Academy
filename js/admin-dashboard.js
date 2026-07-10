@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   let onboardingApplications = [];
   let siteContacts = [];
   let documentSettings = null;
+  let managedProfiles = [];
+  let documentTemplates = [];
 
   // Check initial auth state
   await checkAuth();
@@ -71,6 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (contactsNav) contactsNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
     const documentsNav = document.querySelector('.nav-item[data-tab="documents"]');
     if (documentsNav) documentsNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
+    const usersNav = document.querySelector('.nav-item[data-tab="users"]');
+    if (usersNav) usersNav.style.display = role === 'super_admin' ? 'flex' : 'none';
   }
 
   /* ==========================================
@@ -109,6 +113,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     documentSettings = typeof bsGetDocumentSettings === 'function'
       ? await bsGetDocumentSettings()
       : null;
+    managedProfiles = typeof bsGetManagedProfiles === 'function'
+      ? await bsGetManagedProfiles()
+      : [];
+    documentTemplates = typeof bsGetDocumentTemplates === 'function'
+      ? await bsGetDocumentTemplates()
+      : [];
     
     // Fetch all academy_files
     const { data: filesData } = await supabaseClient.from('academy_files').select('*');
@@ -118,6 +128,142 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderOnboardingApplications(onboardingApplications);
     renderContacts(siteContacts);
     renderDocumentSettings(documentSettings);
+    renderManagedProfiles(managedProfiles);
+    renderDocumentTemplates(documentTemplates);
+  }
+
+  /* ==========================================
+     Users & Permissions
+     ========================================== */
+  const adminUserActionForm = document.getElementById('adminUserActionForm');
+
+  function renderManagedProfiles(profiles) {
+    const tbody = document.getElementById('managedUsersTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!profiles || profiles.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد حسابات ظاهرة حاليا</td></tr>';
+      return;
+    }
+
+    profiles.forEach(profile => {
+      const tr = document.createElement('tr');
+      const status = profile.profile_status || 'active';
+      tr.innerHTML = `
+        <td>
+          <strong>${profile.full_name || 'بدون اسم'}</strong><br>
+          <small>${profile.display_title || profile.whatsapp || profile.id}</small>
+        </td>
+        <td>
+          <select class="role-select" data-id="${profile.id}">
+            ${roleOptions(profile.role)}
+          </select>
+        </td>
+        <td>${formatAccountType(profile.account_type)}</td>
+        <td>
+          <select class="status-select" data-id="${profile.id}">
+            <option value="active" ${status === 'active' ? 'selected' : ''}>Active</option>
+            <option value="disabled" ${status === 'disabled' ? 'selected' : ''}>Disabled</option>
+          </select>
+        </td>
+        <td><span class="status-badge ${profile.onboarding_status || 'needs_profile'}">${formatStatus(profile.onboarding_status)}</span></td>
+        <td class="action-cell">
+          <button class="fm-btn btn-save-user" data-id="${profile.id}">حفظ</button>
+          <button class="fm-btn btn-request-delete-user" data-id="${profile.id}">طلب حذف Auth</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    tbody.querySelectorAll('.btn-save-user').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const userId = btn.dataset.id;
+        const role = tbody.querySelector(`.role-select[data-id="${userId}"]`)?.value || 'student';
+        const profileStatus = tbody.querySelector(`.status-select[data-id="${userId}"]`)?.value || 'active';
+        btn.disabled = true;
+        const result = await bsUpdateManagedProfile(userId, {
+          role,
+          profile_status: profileStatus,
+          onboarding_status: profileStatus === 'disabled' ? 'disabled' : undefined
+        });
+        btn.disabled = false;
+        if (result?.error) {
+          alert('فشل حفظ المستخدم: ' + result.error.message);
+          return;
+        }
+        loadDashboardData();
+      });
+    });
+
+    tbody.querySelectorAll('.btn-request-delete-user').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const profile = managedProfiles.find(item => item.id === btn.dataset.id);
+        if (!profile) return;
+        if (!confirm('سيتم تسجيل طلب حذف Auth لهذا المستخدم. الحذف النهائي يحتاج Edge Function آمنة. هل تؤكد؟')) return;
+        btn.disabled = true;
+        const result = await bsCreateAdminUserAction({
+          action_type: 'delete_auth_user',
+          target_user_id: profile.id,
+          target_email: profile.full_name || profile.id,
+          requested_role: profile.role,
+          requested_account_type: profile.account_type,
+          payload: { profile_snapshot: profile }
+        });
+        await bsUpdateManagedProfile(profile.id, { profile_status: 'disabled', onboarding_status: 'disabled' });
+        btn.disabled = false;
+        if (result?.error) alert('فشل تسجيل طلب الحذف: ' + result.error.message);
+        loadDashboardData();
+      });
+    });
+  }
+
+  function roleOptions(currentRole) {
+    return ['student', 'instructor', 'admin', 'drive_manager', 'super_admin']
+      .map(role => `<option value="${role}" ${role === currentRole ? 'selected' : ''}>${role}</option>`)
+      .join('');
+  }
+
+  function formatAccountType(type) {
+    const map = { student: 'طالب', instructor: 'محاضر', staff: 'فريق / إدارة' };
+    return map[type] || type || '-';
+  }
+
+  if (adminUserActionForm) {
+    adminUserActionForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('managedUserEmail').value.trim();
+      const passwordNote = document.getElementById('managedUserPassword').value.trim();
+      const role = document.getElementById('managedUserRole').value;
+      const accountType = document.getElementById('managedUserAccountType').value;
+      if (!email) {
+        alert('اكتب إيميل المستخدم أولا');
+        return;
+      }
+
+      const submitBtn = adminUserActionForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      const result = await bsCreateAdminUserAction({
+        action_type: 'create_user',
+        target_email: email,
+        requested_role: role,
+        requested_account_type: accountType,
+        requested_password_note: passwordNote ? 'Password provided by owner in dashboard request' : null,
+        payload: {
+          email,
+          role,
+          account_type: accountType,
+          has_password: Boolean(passwordNote)
+        }
+      });
+      submitBtn.disabled = false;
+      if (result?.error) {
+        alert('فشل تسجيل طلب إنشاء المستخدم: ' + result.error.message);
+        return;
+      }
+      adminUserActionForm.reset();
+      alert('تم تسجيل طلب إنشاء المستخدم. التنفيذ النهائي يحتاج Edge Function آمنة بمفتاح service_role.');
+    });
   }
 
   function renderRequests(requests) {
@@ -261,7 +407,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       pending_test: 'اختبار',
       pending_interview: 'مقابلة',
       approved: 'مقبول',
-      rejected: 'مرفوض'
+      rejected: 'مرفوض',
+      disabled: 'معطل'
     };
     return map[status] || status || '-';
   }
@@ -406,6 +553,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      ========================================== */
   const documentSettingsForm = document.getElementById('documentSettingsForm');
   const documentSettingsResetBtn = document.getElementById('documentSettingsResetBtn');
+  const documentPreviewBtn = document.getElementById('documentPreviewBtn');
 
   function renderDocumentSettings(settings) {
     if (!documentSettingsForm) return;
@@ -430,8 +578,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('docAllowDualLanguage').checked = settings?.allow_dual_language !== false;
     document.getElementById('docShowQr').checked = Boolean(invoiceTemplate.show_qr);
     document.getElementById('docQrPosition').value = invoiceTemplate.qr_position || 'footer';
+    document.getElementById('docBankDetails').value = formatBankingDetails(invoiceTemplate.banking_details || settings?.banking_details || {});
+    document.getElementById('docInvoiceTermsAr').value = invoiceTemplate.terms_ar || 'تعتبر هذه الفاتورة رسمية بعد اعتماد الإدارة وختم الأكاديمية.';
+    document.getElementById('docInvoiceTermsEn').value = invoiceTemplate.terms_en || 'This invoice is official after management approval and academy stamp.';
     document.getElementById('docOwnerName').value = officialFooter.owner_name || 'Eng/Bahaa Hussein';
     document.getElementById('docShowOwnerFooter').checked = officialFooter.show_owner_name !== false;
+  }
+
+  function formatBankingDetails(details) {
+    if (!details || Object.keys(details).length === 0) return '';
+    if (typeof details === 'string') return details;
+    return Object.entries(details)
+      .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+      .join('\n');
+  }
+
+  function parseBankingDetails(text) {
+    const details = {};
+    (text || '').split(/\n+/).forEach(line => {
+      const idx = line.indexOf(':');
+      if (idx > -1) {
+        const key = line.slice(0, idx).trim();
+        const value = line.slice(idx + 1).trim();
+        if (key) details[key] = value;
+      }
+    });
+    return details;
   }
 
   function collectDocumentSettings() {
@@ -444,7 +616,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         show_qr: document.getElementById('docShowQr')?.checked || false,
         qr_position: document.getElementById('docQrPosition')?.value || 'footer',
         layout: 'academy_standard',
-        editable_from_dashboard: true
+        editable_from_dashboard: true,
+        banking_details: parseBankingDetails(document.getElementById('docBankDetails')?.value || ''),
+        terms_ar: document.getElementById('docInvoiceTermsAr')?.value || '',
+        terms_en: document.getElementById('docInvoiceTermsEn')?.value || ''
       },
       contract_template: {
         show_logo: true,
@@ -468,7 +643,36 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const submitBtn = documentSettingsForm.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
-      const result = await bsSaveDocumentSettings(collectDocumentSettings());
+      const settingsPayload = collectDocumentSettings();
+      const templateFile = document.getElementById('docTemplateFile')?.files?.[0];
+      let uploadedTemplate = null;
+      if (templateFile && typeof bsUploadToGoogleDrive === 'function') {
+        uploadedTemplate = await bsUploadToGoogleDrive(templateFile, '07_Documents/Templates', {
+          entityType: 'document_template',
+          category: 'template_upload',
+          visibilityScope: 'academy_admin'
+        });
+      }
+
+      const result = await bsSaveDocumentSettings(settingsPayload);
+      if (!result?.error && typeof bsUpsertDocumentTemplate === 'function') {
+        await bsUpsertDocumentTemplate({
+          template_type: 'invoice',
+          name_ar: 'تمبلت فاتورة B&S الرسمي',
+          name_en: 'Official B&S Invoice Template',
+          language_mode: settingsPayload.allow_dual_language ? 'dual' : settingsPayload.default_language,
+          default_currency: settingsPayload.default_currency,
+          header_fields: settingsPayload.invoice_template,
+          body_fields: { show_items: true, show_discount: true, show_total_text: true },
+          footer_fields: settingsPayload.official_footer,
+          banking_details: settingsPayload.invoice_template.banking_details,
+          terms_ar: settingsPayload.invoice_template.terms_ar,
+          terms_en: settingsPayload.invoice_template.terms_en,
+          template_file_url: uploadedTemplate?.url || null,
+          is_default: true,
+          is_active: true
+        });
+      }
       submitBtn.disabled = false;
       if (result?.error) {
         alert('فشل حفظ إعدادات المستندات: ' + result.error.message);
@@ -476,6 +680,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       documentSettings = result.data;
       renderDocumentSettings(documentSettings);
+      documentTemplates = typeof bsGetDocumentTemplates === 'function' ? await bsGetDocumentTemplates() : [];
+      renderDocumentTemplates(documentTemplates);
       alert('تم حفظ إعدادات الفواتير والمستندات');
     });
   }
@@ -489,6 +695,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         invoice_template: { show_qr: false, qr_position: 'footer' },
         official_footer: { owner_name: 'Eng/Bahaa Hussein', show_owner_name: true }
       });
+    });
+  }
+
+  if (documentPreviewBtn) {
+    documentPreviewBtn.addEventListener('click', () => {
+      renderDocumentPreview(collectDocumentSettings());
+    });
+  }
+
+  function renderDocumentPreview(settings) {
+    const preview = document.getElementById('documentTemplatePreview');
+    if (!preview) return;
+    const invoice = settings.invoice_template || {};
+    const footer = settings.official_footer || {};
+    const bankText = formatBankingDetails(invoice.banking_details || {});
+    preview.innerHTML = `
+      <div class="invoice-preview-head">
+        <div>
+          <strong>B&S Academy</strong><br>
+          <span>Invoice / فاتورة</span>
+        </div>
+        <div>
+          <span>Language: ${settings.allow_dual_language ? 'AR + EN' : settings.default_language}</span><br>
+          <span>Currency: ${settings.default_currency}</span>
+        </div>
+      </div>
+      <div>
+        <strong>بيانات تظهر في الفاتورة:</strong>
+        <p>Logo: ${invoice.show_logo ? 'Yes' : 'No'} - QR: ${invoice.show_qr ? invoice.qr_position : 'Hidden'} - Items - Total - Notes</p>
+        <p><strong>Banking:</strong><br>${bankText ? bankText.replace(/\n/g, '<br>') : 'Not configured yet'}</p>
+        <p><strong>Terms AR:</strong> ${invoice.terms_ar || '-'}</p>
+        <p><strong>Terms EN:</strong> ${invoice.terms_en || '-'}</p>
+      </div>
+      <div class="preview-footer">
+        ${footer.show_owner_name !== false ? footer.owner_name || 'Eng/Bahaa Hussein' : ''}<br>
+        ${footer.show_academy_stamp !== false ? 'Academy stamp + official Pb7 signature overlay' : 'Stamp hidden'}
+      </div>
+    `;
+  }
+
+  function renderDocumentTemplates(templates) {
+    const tbody = document.getElementById('documentTemplatesTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!templates || templates.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد تمبلتات محفوظة بعد</td></tr>';
+      return;
+    }
+
+    templates.forEach(template => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${template.template_type || '-'}</td>
+        <td>
+          <strong>${template.name_ar || '-'}</strong><br>
+          <small>${template.name_en || ''}</small>
+        </td>
+        <td>${template.language_mode || '-'}</td>
+        <td>${template.default_currency || '-'}</td>
+        <td>${template.is_default ? 'نعم' : 'لا'}</td>
+        <td><span class="status-badge ${template.is_active ? 'approved' : 'rejected'}">${template.is_active ? 'نشط' : 'معطل'}</span></td>
+      `;
+      tbody.appendChild(tr);
     });
   }
 
