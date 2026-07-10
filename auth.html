@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/auth.css?v=20260709-identity-v1" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/intl-config.js?v=20260710-intl-v1"></script>
   <script src="js/supabase-config.js?v=20260709-identity-v1"></script>
 </head>
 <body class="auth-body">
@@ -74,8 +75,20 @@
             <input type="password" id="signupPassword" autocomplete="new-password" minlength="6" required>
           </label>
           <label>
+            الدولة
+            <select id="signupCountry" data-country-select data-selected="EG"></select>
+          </label>
+          <label>
+            لغة الحساب والمستندات
+            <select id="signupPreferredLanguage" data-document-language-select data-selected="ar"></select>
+          </label>
+          <label class="phone-combo" data-country-phone-group>
             واتساب
-            <input type="tel" id="signupWhatsapp" autocomplete="tel">
+            <select id="signupPhoneCountry" data-country-select data-selected="EG"></select>
+            <span class="dial-code" data-dial-label>+20</span>
+            <input type="tel" id="signupWhatsappLocal" autocomplete="tel" data-local-phone placeholder="1xx xxx xxxx">
+            <input type="hidden" id="signupWhatsapp" data-full-phone>
+            <input type="hidden" id="signupPreferredCurrency" data-country-currency value="EGP">
           </label>
           <label>
             التخصص
