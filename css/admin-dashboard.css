@@ -111,6 +111,7 @@ body.admin-body {
   width: 92px;
   height: 92px;
   object-fit: contain;
+  aspect-ratio: 1;
 }
 
 .admin-gate-card p {
@@ -181,6 +182,7 @@ body.admin-body {
   width: 64px;
   height: 64px;
   object-fit: contain;
+  aspect-ratio: 1;
   display: block;
   margin: 0 auto 10px;
 }
