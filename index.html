@@ -207,14 +207,27 @@
                   </div>
                   <div class="form-row">
                     <div class="form-group">
+                      <label class="form-label" data-i18n="field_country">الدولة<span class="required">*</span></label>
+                      <select class="form-select" name="country_code" data-country-select data-selected="EG" required></select>
+                      <span class="form-error" data-i18n="error_required">هذا الحقل مطلوب</span>
+                    </div>
+                    <div class="form-group phone-combo" data-country-phone-group>
                       <label class="form-label" data-i18n="field_whatsapp">رقم الواتساب<span class="required">*</span></label>
-                      <input type="tel" class="form-input" name="whatsapp" required placeholder="+20 1xx xxx xxxx">
+                      <select class="form-select" name="phone_country_code" data-country-select data-selected="EG"></select>
+                      <span class="dial-code" data-dial-label>+20</span>
+                      <input type="tel" class="form-input" name="phone_local" data-local-phone required placeholder="1xx xxx xxxx">
+                      <input type="hidden" name="whatsapp" data-full-phone>
+                      <input type="hidden" name="preferred_currency" data-country-currency value="EGP">
                       <span class="form-error" data-i18n="error_required">هذا الحقل مطلوب</span>
                     </div>
                     <div class="form-group">
                       <label class="form-label" data-i18n="field_email">البريد الإلكتروني<span class="required">*</span></label>
                       <input type="email" class="form-input" name="email" required>
                       <span class="form-error" data-i18n="error_email">برجاء إدخال بريد إلكتروني صحيح</span>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label" data-i18n="field_doc_language">لغة الفاتورة والمستندات</label>
+                      <select class="form-select" name="preferred_language" data-document-language-select data-selected="ar"></select>
                     </div>
                   </div>
                 </div>
@@ -1055,6 +1068,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="js/i18n.js"></script>
+<script src="js/intl-config.js?v=20260710-intl-v1"></script>
 <script src="js/tracks-data.js"></script>
 <script src="js/router.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
