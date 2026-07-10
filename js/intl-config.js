@@ -70,7 +70,7 @@ function bsPopulateCountrySelect(select, selectedCode = 'EG') {
   const lang = bsIntlLang();
   select.innerHTML = BS_COUNTRIES.map(country => `
     <option value="${country.code}" data-dial="${country.dial}" data-currency="${country.currency}" ${country.code === selectedCode ? 'selected' : ''}>
-      ${bsCountryLabel(country, lang)} (${country.dial})
+      ${bsCountryLabel(country, lang)}
     </option>
   `).join('');
 }
@@ -99,9 +99,28 @@ function bsNormalizeLocalPhone(phone) {
   return String(phone || '').replace(/[^\d]/g, '').replace(/^0+/, '');
 }
 
+function bsExtractLocalPhone(countryCode, phone) {
+  const country = bsFindCountry(countryCode);
+  let digits = String(phone || '').replace(/[^\d]/g, '');
+  const dialDigits = String(country.dial || '').replace(/[^\d]/g, '');
+  if (dialDigits && digits.startsWith(dialDigits)) {
+    digits = digits.slice(dialDigits.length);
+  } else {
+    const matchedDial = BS_COUNTRIES
+      .map(item => String(item.dial || '').replace(/[^\d]/g, ''))
+      .filter(Boolean)
+      .sort((a, b) => b.length - a.length)
+      .find(prefix => digits.startsWith(prefix));
+    if (matchedDial) {
+      digits = digits.slice(matchedDial.length);
+    }
+  }
+  return digits.replace(/^0+/, '');
+}
+
 function bsComposeInternationalPhone(countryCode, localPhone) {
   const country = bsFindCountry(countryCode);
-  const local = bsNormalizeLocalPhone(localPhone);
+  const local = bsExtractLocalPhone(countryCode, localPhone);
   if (!local) return '';
   return `${country.dial}${local}`;
 }
@@ -116,23 +135,32 @@ function bsApplyCountryPhoneGroup(group) {
 
   bsPopulateCountrySelect(countrySelect, countrySelect?.dataset.selected || 'EG');
 
-  function syncPhone() {
+  function syncPhone(options = {}) {
     const country = bsFindCountry(countrySelect?.value || 'EG');
+    const local = bsExtractLocalPhone(country.code, phoneInput?.value || '');
+
     if (dialLabel) dialLabel.textContent = country.dial;
     if (hiddenCurrency) hiddenCurrency.value = country.currency;
-    if (hiddenFullPhone) hiddenFullPhone.value = bsComposeInternationalPhone(country.code, phoneInput?.value || '');
-    if (phoneInput) phoneInput.placeholder = country.code === 'EG' ? '1xx xxx xxxx' : 'phone number';
+    if (hiddenFullPhone) hiddenFullPhone.value = local ? `${country.dial}${local}` : '';
+    if (phoneInput) {
+      phoneInput.placeholder = country.dial + (country.code === 'EG' ? ' 1xx xxx xxxx' : ' phone number');
+      if (options.forcePrefix || (!phoneInput.value && country.dial !== '+')) {
+        phoneInput.value = local ? `${country.dial}${local}` : `${country.dial}`;
+      }
+    }
   }
 
-  countrySelect?.addEventListener('change', syncPhone);
+  countrySelect?.addEventListener('change', () => syncPhone({ forcePrefix: true }));
   phoneInput?.addEventListener('input', syncPhone);
-  syncPhone();
+  syncPhone({ forcePrefix: !phoneInput?.value });
 }
 
-function bsApplyIntlControls(root = document) {
+function bsApplyIntlControls(root = document, options = {}) {
   root.querySelectorAll('[data-country-select]').forEach(select => {
-    if (!select.options.length) {
+    if (!select.options.length || options.refresh) {
+      const currentValue = select.value || select.dataset.selected || 'EG';
       bsPopulateCountrySelect(select, select.dataset.selected || 'EG');
+      if (currentValue) select.value = currentValue;
     }
   });
   root.querySelectorAll('[data-country-phone-group]').forEach(bsApplyCountryPhoneGroup);
