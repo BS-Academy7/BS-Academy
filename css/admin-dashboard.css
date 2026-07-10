@@ -115,31 +115,118 @@ body.admin-body {
 }
 
 .document-live-preview {
-  min-height: 120px;
+  min-height: 420px;
   border: 1px solid #d8e0ea;
   border-radius: 10px;
-  background: #fff;
+  background: #eef2f7;
   padding: 18px;
   margin-bottom: 18px;
   line-height: 1.8;
 }
 
-.document-live-preview .invoice-preview-head {
+.invoice-paper {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.12);
+  padding: 28px;
+  color: #172033;
+}
+
+.invoice-preview-head {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  border-bottom: 1px solid #e7ecf3;
-  padding-bottom: 12px;
-  margin-bottom: 12px;
+  border-bottom: 2px solid #0a2748;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.document-live-preview .preview-footer {
-  margin-top: 16px;
+.invoice-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.invoice-brand img {
+  width: 62px;
+  height: 62px;
+  object-fit: contain;
+}
+
+.invoice-title {
+  text-align: end;
+  font-family: 'Outfit', 'Cairo', sans-serif;
+}
+
+.invoice-title strong {
+  display: block;
+  font-size: 26px;
+  color: #0a2748;
+}
+
+.invoice-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.invoice-box {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fbfdff;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+}
+
+.invoice-table th,
+.invoice-table td {
+  border: 1px solid #d8e0ea;
+  padding: 10px;
+  text-align: start;
+}
+
+.invoice-table th {
+  background: #0a2748;
+  color: #fff;
+}
+
+.invoice-total-row td {
+  font-weight: 800;
+  background: #f4f8fc;
+}
+
+.invoice-terms {
+  border-top: 1px solid #e2e8f0;
   padding-top: 12px;
-  border-top: 1px dashed #c8d3e0;
-  text-align: left;
-  direction: ltr;
+  color: #475569;
+}
+
+.preview-footer {
+  margin-top: 22px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.stamp-preview {
+  width: 220px;
+  min-height: 116px;
+  border: 1px dashed #9aa9bb;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #0a2748;
   font-family: 'Outfit', sans-serif;
+  transform: rotate(-7deg);
+  background: rgba(10, 39, 72, 0.04);
 }
 
 .role-select,
@@ -545,6 +632,11 @@ body.admin-body {
   box-shadow: 0 10px 30px rgba(0,0,0,0.2);
   overflow: hidden;
 }
+
+.modal-content.file-viewer {
+  width: min(1180px, 94vw);
+  max-width: none;
+}
 .modal-header {
   padding: 20px;
   border-bottom: 1px solid #eee;
@@ -561,6 +653,49 @@ body.admin-body {
 }
 .fv-metadata p { margin: 10px 0; font-size: 15px; }
 .fv-actions { margin-top: 25px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+.fv-preview {
+  min-height: 520px;
+  border: 1px solid #d8e0ea;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0f172a;
+  display: grid;
+  place-items: center;
+}
+
+.fv-preview iframe,
+.fv-preview video,
+.fv-preview img {
+  width: 100%;
+  height: 520px;
+  border: 0;
+  display: block;
+  background: #fff;
+}
+
+.fv-preview img {
+  height: auto;
+  max-height: 520px;
+  object-fit: contain;
+  background: #0f172a;
+}
+
+.fv-preview video {
+  object-fit: contain;
+}
+
+.fv-empty,
+.fv-unsupported {
+  padding: 24px;
+  text-align: center;
+  color: #e2e8f0;
+  line-height: 1.8;
+}
+
+.fv-unsupported strong {
+  color: #fff;
+}
 
 /* ---- Drive Tree Manager ---- */
 .file-manager-card {
