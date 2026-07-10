@@ -8,10 +8,10 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="images/logo.png" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/auth.css?v=20260710-responsive-i18n-v1" />
+  <link rel="stylesheet" href="css/auth.css?v=20260710-auth-flow-v1" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/intl-config.js?v=20260710-responsive-i18n-v1"></script>
-  <script src="js/supabase-config.js?v=20260709-identity-v1"></script>
+  <script src="js/supabase-config.js?v=20260710-auth-flow-v1"></script>
 </head>
 <body class="auth-body">
   <main class="auth-shell">
@@ -96,6 +96,50 @@
           </label>
         </div>
 
+        <div class="account-section active" data-account-section="student">
+          <strong>بيانات الطالب</strong>
+          <div class="form-grid">
+            <label>
+              المرحلة الدراسية / المستوى
+              <input type="text" id="signupStudentStage" placeholder="مثال: ثانوي، جامعة، خريج، موظف">
+            </label>
+            <label>
+              هدف التعلم
+              <input type="text" id="signupStudyGoal" placeholder="مثال: كورس، مشروع تخرج، دعم أكاديمي">
+            </label>
+          </div>
+        </div>
+
+        <div class="account-section" data-account-section="instructor">
+          <strong>بيانات المحاضر</strong>
+          <div class="form-grid">
+            <label>
+              مجال التدريس
+              <input type="text" id="signupTeachingTrack" placeholder="مثال: PLC, Accounting, English">
+            </label>
+            <label>
+              رابط أعمال / CV
+              <input type="url" id="signupPortfolioUrl" placeholder="https://...">
+            </label>
+          </div>
+          <p class="section-note">بعد التسجيل يتم استكمال المرفقات، ثم اختبار أو مقابلة حسب قرار الإدارة العليا.</p>
+        </div>
+
+        <div class="account-section" data-account-section="staff">
+          <strong>بيانات الفريق / الإدارة</strong>
+          <div class="form-grid">
+            <label>
+              القسم المطلوب
+              <input type="text" id="signupDepartment" placeholder="مثال: إدارة، دعم فني، مبيعات، محتوى">
+            </label>
+            <label>
+              سبب طلب الصلاحية
+              <input type="text" id="signupAccessReason" placeholder="اشرح باختصار الدور المطلوب">
+            </label>
+          </div>
+          <p class="section-note">أي صلاحيات إدارية لا تُفعّل تلقائيًا، ولازم موافقة الإدارة العليا.</p>
+        </div>
+
         <div class="stage-preview" id="stagePreview">
           <strong>مسار التسجيل:</strong>
           <span id="stagePreviewText">حساب جديد، استكمال بيانات، تفعيل حساب الطالب.</span>
@@ -107,6 +151,6 @@
     </section>
   </main>
 
-  <script src="js/auth.js?v=20260710-responsive-i18n-v1"></script>
+  <script src="js/auth.js?v=20260710-auth-flow-v1"></script>
 </body>
 </html>
