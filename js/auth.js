@@ -84,11 +84,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     setMessage(signupMessage, 'جاري إنشاء الحساب...');
 
     const accountType = signupForm.querySelector('input[name="accountType"]:checked').value;
+    const countryCode = document.getElementById('signupCountry')?.value || 'EG';
+    const phoneCountryCode = document.getElementById('signupPhoneCountry')?.value || countryCode;
+    const whatsappLocal = document.getElementById('signupWhatsappLocal')?.value.trim() || '';
+    const whatsappFull = typeof bsComposeInternationalPhone === 'function'
+      ? bsComposeInternationalPhone(phoneCountryCode, whatsappLocal)
+      : document.getElementById('signupWhatsapp').value.trim();
+
     const payload = {
       fullName: document.getElementById('signupName').value.trim(),
       email: document.getElementById('signupEmail').value.trim(),
       password: document.getElementById('signupPassword').value,
-      whatsapp: document.getElementById('signupWhatsapp').value.trim(),
+      whatsapp: whatsappFull,
+      phoneLocal: whatsappLocal,
+      countryCode,
+      phoneCountryCode,
+      preferredLanguage: document.getElementById('signupPreferredLanguage')?.value || 'ar',
+      preferredCurrency: document.getElementById('signupPreferredCurrency')?.value || 'EGP',
       accountType,
       specialty: document.getElementById('signupSpecialty').value.trim(),
       desiredPosition: document.getElementById('signupPosition').value.trim()
