@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/admin-dashboard.css?v=20260710-contacts-v1" />
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/intl-config.js?v=20260710-intl-v1"></script>
   <script src="js/supabase-config.js?v=20260710-contacts-v1"></script>
 </head>
 <body class="admin-body">
@@ -55,6 +56,10 @@
         <a href="#contacts" class="nav-item" data-tab="contacts">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.91.33 1.8.62 2.65a2 2 0 0 1-.45 2.11L8 9.75a16 16 0 0 0 6.25 6.25l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.74.5 2.65.62A2 2 0 0 1 22 16.92z"></path></svg>
           وسائل التواصل
+        </a>
+        <a href="#documents" class="nav-item" data-tab="documents">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"></path><path d="M8 8h8"></path><path d="M8 12h8"></path><path d="M8 16h5"></path></svg>
+          الفواتير والمستندات
         </a>
       </nav>
       <div class="sidebar-footer">
@@ -193,6 +198,61 @@
           </div>
         </div>
         
+        <!-- Documents View -->
+        <div id="view-documents" class="admin-view">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>إعدادات الفواتير والمستندات</h2>
+                <p>اختيار اللغة والعملة الافتراضية، وتجهيز التمبلت الرسمي للفواتير والعقود والشهادات.</p>
+              </div>
+            </div>
+
+            <form id="documentSettingsForm" class="document-settings-form">
+              <label>
+                اللغة الافتراضية للمستند
+                <select id="docDefaultLanguage" data-document-language-select data-selected="ar"></select>
+              </label>
+              <label>
+                العملة الافتراضية
+                <select id="docDefaultCurrency" data-currency-select data-selected="EGP"></select>
+              </label>
+              <label class="contact-active-row">
+                <input type="checkbox" id="docAllowDualLanguage" checked>
+                السماح بإصدار الفاتورة بلغتين في نفس المستند
+              </label>
+              <label class="contact-active-row">
+                <input type="checkbox" id="docShowQr">
+                إظهار QR Code في الفاتورة عند الحاجة
+              </label>
+              <label>
+                مكان QR Code
+                <select id="docQrPosition">
+                  <option value="footer">آخر الفاتورة</option>
+                  <option value="header">أعلى الفاتورة</option>
+                  <option value="hidden">مخفي</option>
+                </select>
+              </label>
+              <label class="document-wide">
+                اسم الاعتماد الرسمي
+                <input type="text" id="docOwnerName" value="Eng/Bahaa Hussein">
+              </label>
+              <label class="contact-active-row">
+                <input type="checkbox" id="docShowOwnerFooter" checked>
+                إضافة الاسم والختم والتوقيع الرسمي تلقائيا في آخر المستند
+              </label>
+              <div class="document-preview-card">
+                <strong>قاعدة الإخراج:</strong>
+                <span>كل فاتورة/عقد/شهادة يخرج حسب لغة الطالب أو اختيار الإدارة، وبالعملة المختارة، مع إمكانية تعديل التمبلت مستقبلا من الداشبورد.</span>
+              </div>
+              <div class="contact-form-actions">
+                <button type="submit" class="btn btn-primary">حفظ إعدادات المستندات</button>
+                <button type="button" id="documentSettingsResetBtn" class="btn btn-outline">استعادة الافتراضي</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <!-- Files View (Drive Tree Manager) -->
         <div id="view-files" class="admin-view">
           <div class="card file-manager-card">
