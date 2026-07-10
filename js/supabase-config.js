@@ -136,6 +136,77 @@ async function bsGetProfile(userId) {
   return data;
 }
 
+async function bsGetManagedProfiles() {
+  if (!supabaseClient) return [];
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .select('id, full_name, role, account_type, onboarding_status, whatsapp, country_code, preferred_language, preferred_currency, profile_status, disabled_at, display_title, specialty, desired_position, admin_notes, approved_at')
+    .order('full_name', { ascending: true });
+  if (error) {
+    console.warn('[B&S] Could not load managed profiles', error);
+    return [];
+  }
+  return data || [];
+}
+
+async function bsUpdateManagedProfile(userId, patch = {}) {
+  if (!supabaseClient || !userId) return { error: { message: 'Missing user id' } };
+  const allowed = {};
+  [
+    'full_name',
+    'role',
+    'account_type',
+    'onboarding_status',
+    'profile_status',
+    'display_title',
+    'specialty',
+    'desired_position',
+    'admin_notes'
+  ].forEach(key => {
+    if (patch[key] !== undefined) allowed[key] = patch[key];
+  });
+
+  if (allowed.profile_status === 'disabled') {
+    allowed.disabled_at = new Date().toISOString();
+    const currentUser = await bsGetCurrentUser();
+    allowed.disabled_by = currentUser ? currentUser.id : null;
+  } else if (allowed.profile_status === 'active') {
+    allowed.disabled_at = null;
+    allowed.disabled_by = null;
+  }
+
+  const { data, error } = await supabaseClient
+    .from('profiles')
+    .update(allowed)
+    .eq('id', userId)
+    .select()
+    .single();
+  return { data, error };
+}
+
+async function bsCreateAdminUserAction(action = {}) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const currentUser = await bsGetCurrentUser();
+  const payload = {
+    action_type: action.action_type || 'create_user',
+    target_user_id: action.target_user_id || null,
+    target_email: action.target_email || null,
+    requested_role: action.requested_role || 'student',
+    requested_account_type: action.requested_account_type || 'student',
+    requested_password_note: action.requested_password_note || null,
+    payload: action.payload || {},
+    status: 'pending',
+    requested_by: currentUser ? currentUser.id : null,
+    admin_notes: action.admin_notes || null
+  };
+  const { data, error } = await supabaseClient
+    .from('admin_user_actions')
+    .insert([payload])
+    .select()
+    .single();
+  return { data, error };
+}
+
 async function bsEnsureOnboardingApplication(userId, payload = {}) {
   if (!supabaseClient || !userId) return { error: { message: 'Supabase not configured yet' } };
   const accountType = ['student', 'instructor', 'staff'].includes(payload.accountType)
@@ -197,6 +268,80 @@ async function bsSaveDocumentSettings(settings = {}) {
     .select()
     .single();
 
+  return { data, error };
+}
+
+async function bsGetDocumentTemplates() {
+  if (!supabaseClient) return [];
+  const { data, error } = await supabaseClient
+    .from('academy_document_templates')
+    .select('*')
+    .order('template_type', { ascending: true })
+    .order('created_at', { ascending: true });
+  if (error) {
+    console.warn('[B&S] Could not load document templates', error);
+    return [];
+  }
+  return data || [];
+}
+
+async function bsUpsertDocumentTemplate(template = {}) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const currentUser = await bsGetCurrentUser();
+  const payload = {
+    template_type: template.template_type || 'invoice',
+    name_ar: template.name_ar || 'تمبلت جديد',
+    name_en: template.name_en || template.name_ar || 'New template',
+    language_mode: template.language_mode || 'ar',
+    default_currency: template.default_currency || 'EGP',
+    header_fields: template.header_fields || {},
+    body_fields: template.body_fields || {},
+    footer_fields: template.footer_fields || {},
+    banking_details: template.banking_details || {},
+    terms_ar: template.terms_ar || '',
+    terms_en: template.terms_en || '',
+    template_file_id: template.template_file_id || null,
+    template_file_url: template.template_file_url || null,
+    is_default: template.is_default === true,
+    is_active: template.is_active !== false,
+    updated_by: currentUser ? currentUser.id : null,
+    updated_at: new Date().toISOString()
+  };
+  if (template.id) payload.id = template.id;
+  if (!template.id) payload.created_by = currentUser ? currentUser.id : null;
+
+  const { data, error } = await supabaseClient
+    .from('academy_document_templates')
+    .upsert([payload])
+    .select()
+    .single();
+  return { data, error };
+}
+
+async function bsCreateGeneratedDocumentDraft(documentPayload = {}) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const currentUser = await bsGetCurrentUser();
+  const payload = {
+    document_type: documentPayload.document_type || 'invoice',
+    template_id: documentPayload.template_id || null,
+    related_entity_type: documentPayload.related_entity_type || null,
+    related_entity_id: documentPayload.related_entity_id || null,
+    recipient_user_id: documentPayload.recipient_user_id || null,
+    recipient_name: documentPayload.recipient_name || '',
+    recipient_email: documentPayload.recipient_email || '',
+    language_mode: documentPayload.language_mode || 'ar',
+    currency: documentPayload.currency || 'EGP',
+    amount: documentPayload.amount || null,
+    status: 'draft',
+    document_data: documentPayload.document_data || {},
+    created_by: currentUser ? currentUser.id : null
+  };
+
+  const { data, error } = await supabaseClient
+    .from('academy_generated_documents')
+    .insert([payload])
+    .select()
+    .single();
   return { data, error };
 }
 
