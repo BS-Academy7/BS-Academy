@@ -10,11 +10,11 @@
   <link rel="preload" href="images/logo.png" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260710-responsive-i18n-v1" />
+  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260710-management-v1" />
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/intl-config.js?v=20260710-responsive-i18n-v1"></script>
-  <script src="js/supabase-config.js?v=20260710-contacts-v1"></script>
+  <script src="js/supabase-config.js?v=20260710-management-v1"></script>
 </head>
 <body class="admin-body">
   
@@ -48,6 +48,10 @@
         <a href="#onboarding" class="nav-item" data-tab="onboarding">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m16 11 2 2 4-4"></path></svg>
           التسجيلات والمراحل
+        </a>
+        <a href="#users" class="nav-item" data-tab="users">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          المستخدمون والصلاحيات
         </a>
         <a href="#files" class="nav-item" data-tab="files">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
@@ -126,6 +130,73 @@
                 </thead>
                 <tbody id="onboardingTableBody">
                   <tr><td colspan="7" class="loading-cell">جاري التحميل...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users & Permissions View -->
+        <div id="view-users" class="admin-view">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>المستخدمون والصلاحيات</h2>
+                <p>كل حساب يسجل في الأكاديمية يظهر هنا، مع إمكانية تعديل الدور أو تعطيل الحساب من الداشبورد.</p>
+              </div>
+            </div>
+
+            <div class="admin-warning-box">
+              <strong>مهم:</strong>
+              إنشاء مستخدم بالباسورد أو حذف مستخدم من Supabase Auth نهائيا يحتاج Edge Function بمفتاح service_role. هنا نسجل الطلب ونعدل الصلاحيات الآمنة فقط من الداشبورد.
+            </div>
+
+            <form id="adminUserActionForm" class="management-form">
+              <label>
+                إيميل المستخدم
+                <input type="email" id="managedUserEmail" placeholder="user@example.com" required>
+              </label>
+              <label>
+                كلمة المرور المقترحة
+                <input type="text" id="managedUserPassword" placeholder="تستخدم لاحقا داخل Edge Function الآمنة">
+              </label>
+              <label>
+                الدور المطلوب
+                <select id="managedUserRole">
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                  <option value="admin">Admin</option>
+                  <option value="drive_manager">Drive Manager</option>
+                  <option value="super_admin">Super Admin</option>
+                </select>
+              </label>
+              <label>
+                نوع الحساب
+                <select id="managedUserAccountType">
+                  <option value="student">طالب</option>
+                  <option value="instructor">محاضر</option>
+                  <option value="staff">فريق / إدارة</option>
+                </select>
+              </label>
+              <div class="contact-form-actions">
+                <button type="submit" class="btn btn-primary">تسجيل طلب إنشاء مستخدم</button>
+              </div>
+            </form>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>الاسم</th>
+                    <th>الدور</th>
+                    <th>نوع الحساب</th>
+                    <th>حالة الحساب</th>
+                    <th>الحالة الداخلية</th>
+                    <th>إجراء</th>
+                  </tr>
+                </thead>
+                <tbody id="managedUsersTableBody">
+                  <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -234,6 +305,22 @@
                 </select>
               </label>
               <label class="document-wide">
+                بيانات البنك / المحافظ
+                <textarea id="docBankDetails" rows="4" placeholder="Bank name, account name, IBAN, wallets..."></textarea>
+              </label>
+              <label class="document-wide">
+                شروط الفاتورة بالعربي
+                <textarea id="docInvoiceTermsAr" rows="4" placeholder="الشروط التي تظهر في آخر الفاتورة"></textarea>
+              </label>
+              <label class="document-wide">
+                Invoice terms in English
+                <textarea id="docInvoiceTermsEn" rows="4" placeholder="Invoice terms shown in English"></textarea>
+              </label>
+              <label class="document-wide">
+                رفع تمبلت فاتورة/عقد Word أو PDF
+                <input type="file" id="docTemplateFile" accept=".doc,.docx,.pdf,image/*">
+              </label>
+              <label class="document-wide">
                 اسم الاعتماد الرسمي
                 <input type="text" id="docOwnerName" value="Eng/Bahaa Hussein">
               </label>
@@ -247,9 +334,39 @@
               </div>
               <div class="contact-form-actions">
                 <button type="submit" class="btn btn-primary">حفظ إعدادات المستندات</button>
+                <button type="button" id="documentPreviewBtn" class="btn btn-outline">معاينة التمبلت</button>
                 <button type="button" id="documentSettingsResetBtn" class="btn btn-outline">استعادة الافتراضي</button>
               </div>
             </form>
+          </div>
+
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>تمبلتات الفواتير والعقود</h2>
+                <p>قائمة التمبلتات المحفوظة، وبعد الربط الكامل يتم توليد PDF/عقد من هنا بالختم والتوقيع.</p>
+              </div>
+            </div>
+            <div id="documentTemplatePreview" class="document-live-preview">
+              اختر “معاينة التمبلت” لعرض شكل البيانات التي ستخرج في الفاتورة أو العقد.
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>النوع</th>
+                    <th>الاسم</th>
+                    <th>اللغة</th>
+                    <th>العملة</th>
+                    <th>افتراضي</th>
+                    <th>الحالة</th>
+                  </tr>
+                </thead>
+                <tbody id="documentTemplatesTableBody">
+                  <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -303,6 +420,6 @@
     </div>
   </div>
 
-  <script src="js/admin-dashboard.js?v=20260710-contacts-v1"></script>
+  <script src="js/admin-dashboard.js?v=20260710-management-v1"></script>
 </body>
 </html>
