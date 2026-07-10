@@ -7,7 +7,7 @@
 const translations = {
   ar: {
     skip_link: "تخطّى إلى المحتوى",
-    brand_academy: "أكاديمي",
+    brand_academy: "Academy",
     brand_tagline: "Learning · Growth · Solutions",
     nav_home: "الرئيسية",
     nav_about: "من نحن",
@@ -52,11 +52,13 @@ const translations = {
     step5_desc: "إزاي حابب تستلم الشرح؟",
 
     field_fullname: "الاسم بالكامل",
+    field_country: "الدولة",
     field_whatsapp: "رقم الواتساب",
     field_email: "البريد الإلكتروني",
     field_password: "كلمة المرور",
     field_level: "المرحلة الدراسية",
     field_faculty: "الكلية / التخصص",
+    placeholder_faculty: "مثال: هندسة القوى الكهربية",
     field_subject: "اسم المادة",
     field_topic: "عنوان الموضوع",
     field_description: "تفاصيل أكتر — إيه بالظبط اللي محتاج شرحه؟",
@@ -291,11 +293,13 @@ const translations = {
     step5_desc: "How would you like to receive it?",
 
     field_fullname: "Full Name",
+    field_country: "Country",
     field_whatsapp: "WhatsApp Number",
     field_email: "Email Address",
     field_password: "Password",
     field_level: "Academic Level",
     field_faculty: "Faculty / Major",
+    placeholder_faculty: "Example: Electrical Power Engineering",
     field_subject: "Subject Name",
     field_topic: "Topic Title",
     field_description: "More details — what exactly needs explaining?",
@@ -499,10 +503,23 @@ function applyTranslations(lang) {
     }
   });
 
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (translations[lang] && translations[lang][key] !== undefined) {
+      el.setAttribute('placeholder', translations[lang][key]);
+    }
+  });
+
   const langLabel = document.getElementById('langToggleLabel');
   if (langLabel) langLabel.textContent = lang === 'ar' ? 'EN' : 'AR';
 
   localStorage.setItem('bs_lang', lang);
+
+  if (typeof bsApplyIntlControls === 'function') {
+    bsApplyIntlControls(document, { refresh: true });
+  }
+
+  document.dispatchEvent(new CustomEvent('bs:languagechange', { detail: { lang } }));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
