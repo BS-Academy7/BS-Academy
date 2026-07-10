@@ -47,11 +47,19 @@ async function bsSignUp(email, password, fullName, options = {}) {
   const accountType = ['student', 'instructor', 'staff'].includes(options.accountType)
     ? options.accountType
     : 'student';
+  const emailRedirectTo = (() => {
+    try {
+      return new URL('auth.html', window.location.href).href;
+    } catch (error) {
+      return 'https://bs-academy7.github.io/BS-Academy/auth.html';
+    }
+  })();
 
   const { data, error } = await supabaseClient.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo,
       data: {
         full_name: fullName,
         whatsapp: options.whatsapp || '',
@@ -454,12 +462,12 @@ async function bsUploadImage(file, folder = 'site-content', metadata = {}) {
 
 async function bsSubmitOnDemandRequest(payload) {
   if (!supabaseClient) return { error: { message: 'Supabase not configured yet — request was not saved to database' } };
-  const { data, error } = await supabaseClient
+  const requestId = payload.id || crypto.randomUUID();
+  const row = { ...payload, id: requestId };
+  const { error } = await supabaseClient
     .from('ondemand_requests')
-    .insert([payload])
-    .select()
-    .single();
-  return { data, error };
+    .insert([row]);
+  return { data: error ? null : row, error };
 }
 
 async function bsGetAllRequests() {
