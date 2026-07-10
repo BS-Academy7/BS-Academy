@@ -177,6 +177,13 @@
   line-height: 1;
 }
 
+.contact-icon-at {
+  font-size: var(--text-xl);
+  color: var(--gold);
+  font-family: Arial, sans-serif;
+  transform: translateY(-1px);
+}
+
 .footer-contact-link {
   display: inline-flex;
   align-items: center;
