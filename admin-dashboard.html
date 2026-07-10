@@ -10,11 +10,11 @@
   <link rel="preload" href="images/logo.png" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260710-management-v1" />
+  <link rel="stylesheet" href="css/admin-dashboard.css?v=20260711-viewer-v1" />
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/intl-config.js?v=20260710-responsive-i18n-v1"></script>
-  <script src="js/supabase-config.js?v=20260710-management-v1"></script>
+  <script src="js/supabase-config.js?v=20260711-viewer-v1"></script>
 </head>
 <body class="admin-body">
   
@@ -409,6 +409,9 @@
           <p><strong>الحجم:</strong> <span id="fvSize">...</span></p>
           <p><strong>النوع:</strong> <span id="fvType">...</span></p>
         </div>
+        <div id="fvPreview" class="fv-preview">
+          <div class="fv-empty">اختر ملفا لعرضه داخل الأكاديمية.</div>
+        </div>
         
         <div class="fv-actions">
           <!-- Download Button for All Admins -->
@@ -420,6 +423,6 @@
     </div>
   </div>
 
-  <script src="js/admin-dashboard.js?v=20260710-management-v1"></script>
+  <script src="js/admin-dashboard.js?v=20260711-viewer-v1"></script>
 </body>
 </html>
