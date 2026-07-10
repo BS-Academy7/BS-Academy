@@ -173,6 +173,11 @@
     const payload = {
       full_name: formData.get('full_name'),
       whatsapp: formData.get('whatsapp'),
+      country_code: formData.get('country_code') || 'EG',
+      phone_country_code: formData.get('phone_country_code') || formData.get('country_code') || 'EG',
+      phone_local: formData.get('phone_local') || null,
+      preferred_language: formData.get('preferred_language') || (currentLang || 'ar'),
+      preferred_currency: formData.get('preferred_currency') || 'EGP',
       email: formData.get('email'),
       academic_level: formData.get('academic_level'),
       faculty_major: formData.get('faculty_major') || null,
@@ -183,60 +188,76 @@
       deadline_date: formData.get('deadline_date') || null
     };
 
-    // Upload attachments through the configured file bridge, then save the returned links.
-    let attachmentUrls = [];
-    if (typeof bsUploadImage === 'function' && uploadedFiles.length) {
-      for (const file of uploadedFiles) {
-        const result = await bsUploadImage(file, 'ondemand-attachments', {
-          requestType: 'ondemand',
-          studentName: payload.full_name,
-          studentId: payload.email || payload.whatsapp,
-          whatsapp: payload.whatsapp,
-          email: payload.email,
-          subjectName: payload.subject_name,
-          topicTitle: payload.topic_title,
-          academicLevel: payload.academic_level
-        });
-        if (result.error) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = currentLang === 'ar' ? 'إرسال الطلب' : 'Submit Request';
-          const msg = currentLang === 'ar'
-            ? `حصل خطأ أثناء رفع الملف ${file.name}:\n${result.error.message || result.error}`
-            : `An error occurred while uploading ${file.name}:\n${result.error.message || result.error}`;
-          alert(msg);
-          showToast(currentLang === 'ar' ? '❌ فشل رفع المرفقات' : '❌ Attachment upload failed', true);
-          return;
-        }
-        if (result.url) attachmentUrls.push(result.url);
-      }
-    }
-    payload.attachment_urls = attachmentUrls;
-
     let submissionError = null;
+    let savedRequest = null;
 
     if (typeof bsSubmitOnDemandRequest === 'function') {
       const result = await bsSubmitOnDemandRequest(payload);
       if (result && result.error) {
         submissionError = result.error;
+      } else if (result && result.data) {
+        savedRequest = result.data;
       }
     } else {
       submissionError = { message: 'bsSubmitOnDemandRequest function not found — js/supabase-config.js may not have loaded.' };
     }
 
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = currentLang === 'ar' ? 'إرسال الطلب' : 'Submit Request';
-
     if (submissionError) {
-      // Show a clear, visible diagnostic instead of failing silently
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = currentLang === 'ar' ? 'إرسال الطلب' : 'Submit Request';
       const msg = currentLang === 'ar'
         ? `حصل خطأ ولم يتم حفظ الطلب:\n${submissionError.message || submissionError}`
         : `An error occurred and the request was NOT saved:\n${submissionError.message || submissionError}`;
       alert(msg);
       showToast(currentLang === 'ar' ? '❌ فشل إرسال الطلب — راجع التفاصيل' : '❌ Submission failed — see details', true);
-      return; // Do NOT show success panel — be honest about the failure
+      return; 
     }
 
-    // Only reached if the request was genuinely saved successfully
+    // Now upload attachments and link them to the saved request
+    let attachmentUrls = [];
+    if (savedRequest && typeof bsUploadImage === 'function' && uploadedFiles.length) {
+      for (const file of uploadedFiles) {
+        const metadata = {
+          requestType: 'ondemand',
+          studentName: payload.full_name,
+          studentId: payload.email || payload.whatsapp,
+          whatsapp: payload.whatsapp,
+          email: payload.email,
+          countryCode: payload.country_code,
+          preferredLanguage: payload.preferred_language,
+          preferredCurrency: payload.preferred_currency,
+          subjectName: payload.subject_name,
+          topicTitle: payload.topic_title,
+          academicLevel: payload.academic_level,
+          entityType: 'ondemand_request',
+          entityId: savedRequest.id,
+          category: 'attachment'
+        };
+        const result = await bsUploadImage(file, 'ondemand-attachments', metadata);
+        if (result.error) {
+          // Soft error: the request is saved, but file failed.
+          const msg = currentLang === 'ar'
+            ? `الطلب تم حفظه ولكن حصل خطأ أثناء رفع الملف ${file.name}:\n${result.error.message || result.error}`
+            : `Request saved, but error uploading ${file.name}:\n${result.error.message || result.error}`;
+          alert(msg);
+        } else if (result.url) {
+          attachmentUrls.push(result.url);
+          // Register file in academy_files index
+          if (typeof bsRegisterAcademyFile === 'function') {
+            await bsRegisterAcademyFile(result, metadata);
+          }
+        }
+      }
+
+      // Update the request with attachmentUrls array for backwards compatibility
+      if (attachmentUrls.length > 0 && typeof supabaseClient !== 'undefined') {
+        await supabaseClient.from('ondemand_requests').update({ attachment_urls: attachmentUrls }).eq('id', savedRequest.id);
+      }
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = currentLang === 'ar' ? 'إرسال الطلب' : 'Submit Request';
+
     form.style.display = 'none';
     successPanel.classList.add('active');
   });
