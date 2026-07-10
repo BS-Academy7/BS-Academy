@@ -69,6 +69,11 @@
         fieldValid = Array.from(radioGroup).some(r => r.checked);
       } else if (field.type === 'email') {
         fieldValid = field.value.trim() !== '' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value);
+      } else if (field.matches('[data-local-phone]')) {
+        const countryCode = form.querySelector('[name="phone_country_code"]')?.value || form.querySelector('[name="country_code"]')?.value || 'EG';
+        fieldValid = typeof bsExtractLocalPhone === 'function'
+          ? bsExtractLocalPhone(countryCode, field.value).length >= 6
+          : field.value.replace(/[^\d]/g, '').length >= 6;
       } else {
         fieldValid = field.value.trim() !== '';
       }
@@ -170,12 +175,19 @@
     submitBtn.innerHTML = '<span class="spinner"></span>';
 
     const formData = new FormData(form);
+    const selectedPhoneCountry = formData.get('phone_country_code') || formData.get('country_code') || 'EG';
+    const localPhone = typeof bsExtractLocalPhone === 'function'
+      ? bsExtractLocalPhone(selectedPhoneCountry, formData.get('phone_local'))
+      : String(formData.get('phone_local') || '').replace(/[^\d]/g, '');
+    const fullPhone = typeof bsComposeInternationalPhone === 'function'
+      ? bsComposeInternationalPhone(selectedPhoneCountry, formData.get('phone_local'))
+      : formData.get('whatsapp');
     const payload = {
       full_name: formData.get('full_name'),
-      whatsapp: formData.get('whatsapp'),
+      whatsapp: fullPhone,
       country_code: formData.get('country_code') || 'EG',
-      phone_country_code: formData.get('phone_country_code') || formData.get('country_code') || 'EG',
-      phone_local: formData.get('phone_local') || null,
+      phone_country_code: selectedPhoneCountry,
+      phone_local: localPhone || null,
       preferred_language: formData.get('preferred_language') || (currentLang || 'ar'),
       preferred_currency: formData.get('preferred_currency') || 'EGP',
       email: formData.get('email'),
@@ -272,6 +284,7 @@
   });
 
   renderStepDots();
+  document.addEventListener('bs:languagechange', renderStepDots);
 })();
 
 /* ---- Toast helper (shared) ---- */
