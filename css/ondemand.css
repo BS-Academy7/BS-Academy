@@ -7,7 +7,7 @@
 
 .phone-combo {
   display: grid;
-  grid-template-columns: minmax(120px, 0.9fr) auto minmax(160px, 1.1fr);
+  grid-template-columns: minmax(220px, 1fr);
   gap: 8px;
   align-items: end;
 }
@@ -17,7 +17,7 @@
 }
 
 .phone-combo .dial-code {
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   min-height: 46px;
@@ -227,6 +227,7 @@
 
 .form-body {
   padding: var(--space-8);
+  overflow: hidden;
 }
 
 .form-step {
@@ -235,6 +236,13 @@
 }
 
 .form-step.active { display: block; }
+
+.form-step:not(.active) {
+  display: none !important;
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+}
 
 @keyframes step-fade-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -319,6 +327,29 @@
 }
 
 .form-group.invalid .form-error { display: block; }
+
+.phone-combo--locked {
+  grid-template-columns: minmax(220px, 1fr);
+}
+
+.phone-combo--locked > .form-label {
+  grid-column: 1 / -1;
+}
+
+.phone-combo--locked > select[data-country-select] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.phone-combo [data-local-phone] {
+  direction: ltr;
+  text-align: left;
+  font-weight: 700;
+}
 
 /* Conditional field */
 .conditional-field {
