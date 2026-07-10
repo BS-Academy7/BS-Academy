@@ -130,6 +130,11 @@ function bsApplyCountryPhoneGroup(group) {
 }
 
 function bsApplyIntlControls(root = document) {
+  root.querySelectorAll('[data-country-select]').forEach(select => {
+    if (!select.options.length) {
+      bsPopulateCountrySelect(select, select.dataset.selected || 'EG');
+    }
+  });
   root.querySelectorAll('[data-country-phone-group]').forEach(bsApplyCountryPhoneGroup);
   root.querySelectorAll('[data-currency-select]').forEach(select => {
     bsPopulateCurrencySelect(select, select.dataset.selected || 'EGP');
