@@ -290,7 +290,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else if (req.attachment_urls && req.attachment_urls.length > 0) {
         // Fallback for old requests that weren't registered in academy_files
         req.attachment_urls.forEach((url, idx) => {
-          attachmentsHtml += `<a href="${url}" target="_blank" class="attachment-btn" style="text-decoration:none;">🔗 مرفق ${idx+1} (قديم)</a>`;
+          const escapedUrl = encodeURIComponent(url);
+          attachmentsHtml += `<button class="attachment-btn" onclick="openExternalFileViewer('${escapedUrl}', 'مرفق ${idx+1}', '')">🔗 مرفق ${idx+1} (قديم)</button>`;
         });
       } else {
         attachmentsHtml = '<span style="color:#888;">لا يوجد</span>';
@@ -711,26 +712,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     const footer = settings.official_footer || {};
     const bankText = formatBankingDetails(invoice.banking_details || {});
     preview.innerHTML = `
-      <div class="invoice-preview-head">
-        <div>
-          <strong>B&S Academy</strong><br>
-          <span>Invoice / فاتورة</span>
+      <div class="invoice-paper">
+        <div class="invoice-preview-head">
+          <div class="invoice-brand">
+            <img src="images/logo.png" alt="B&S Academy">
+            <div>
+              <strong>B&S Academy</strong><br>
+              <span>Learning · Growth · Solutions</span>
+            </div>
+          </div>
+          <div class="invoice-title">
+            <strong>INVOICE</strong>
+            <span>فاتورة رسمية</span>
+          </div>
         </div>
-        <div>
-          <span>Language: ${settings.allow_dual_language ? 'AR + EN' : settings.default_language}</span><br>
-          <span>Currency: ${settings.default_currency}</span>
+        <div class="invoice-meta-grid">
+          <div class="invoice-box">
+            <strong>Bill To / بيانات العميل</strong><br>
+            Student Name<br>
+            student@example.com<br>
+            Country / الدولة
+          </div>
+          <div class="invoice-box">
+            <strong>Invoice Details</strong><br>
+            No: BSA-0001<br>
+            Language: ${settings.allow_dual_language ? 'AR + EN' : settings.default_language}<br>
+            Currency: ${settings.default_currency}
+          </div>
         </div>
-      </div>
-      <div>
-        <strong>بيانات تظهر في الفاتورة:</strong>
-        <p>Logo: ${invoice.show_logo ? 'Yes' : 'No'} - QR: ${invoice.show_qr ? invoice.qr_position : 'Hidden'} - Items - Total - Notes</p>
-        <p><strong>Banking:</strong><br>${bankText ? bankText.replace(/\n/g, '<br>') : 'Not configured yet'}</p>
-        <p><strong>Terms AR:</strong> ${invoice.terms_ar || '-'}</p>
-        <p><strong>Terms EN:</strong> ${invoice.terms_en || '-'}</p>
-      </div>
-      <div class="preview-footer">
-        ${footer.show_owner_name !== false ? footer.owner_name || 'Eng/Bahaa Hussein' : ''}<br>
-        ${footer.show_academy_stamp !== false ? 'Academy stamp + official Pb7 signature overlay' : 'Stamp hidden'}
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Description</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Course / Service</td>
+              <td>Academy service details shown here</td>
+              <td>${settings.default_currency} 1,000.00</td>
+            </tr>
+            <tr class="invoice-total-row">
+              <td colspan="2">Total / الإجمالي</td>
+              <td>${settings.default_currency} 1,000.00</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="invoice-terms">
+          <p><strong>Banking:</strong><br>${bankText ? bankText.replace(/\n/g, '<br>') : 'Not configured yet'}</p>
+          <p><strong>الشروط:</strong> ${invoice.terms_ar || '-'}</p>
+          <p><strong>Terms:</strong> ${invoice.terms_en || '-'}</p>
+          <p><strong>QR:</strong> ${invoice.show_qr ? invoice.qr_position : 'Hidden'}</p>
+        </div>
+        <div class="preview-footer">
+          <div class="stamp-preview">
+            ${footer.show_owner_name !== false ? footer.owner_name || 'Eng/Bahaa Hussein' : ''}<br>
+            Academy stamp<br>
+            Pb7 Signature
+          </div>
+        </div>
       </div>
     `;
   }
@@ -771,10 +813,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.openFileViewer = function(fileId) {
     const file = allAcademyFiles.find(f => f.id === fileId);
     if (!file) return;
+    renderFileViewer(file);
+  };
 
+  window.openExternalFileViewer = function(encodedUrl, fileName, mimeType) {
+    const url = decodeURIComponent(encodedUrl || '');
+    renderFileViewer({
+      file_name: fileName || 'External file',
+      file_size: 0,
+      mime_type: mimeType || guessMimeTypeFromUrl(url),
+      drive_url: url,
+      drive_file_id: extractDriveFileId(url)
+    });
+  };
+
+  function renderFileViewer(file) {
     document.getElementById('fvName').textContent = file.file_name;
-    document.getElementById('fvSize').textContent = (file.file_size / 1024 / 1024).toFixed(2) + ' MB';
-    document.getElementById('fvType').textContent = file.mime_type;
+    document.getElementById('fvSize').textContent = file.file_size ? (file.file_size / 1024 / 1024).toFixed(2) + ' MB' : '-';
+    document.getElementById('fvType').textContent = file.mime_type || guessMimeTypeFromUrl(file.drive_url || '');
+    renderFilePreview(file);
     
     // In the future this should hit a gateway endpoint. For now, it uses the raw Drive link 
     // but the actual URL is hidden from HTML source code unless clicked.
@@ -793,15 +850,94 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     modal.classList.add('active');
-  };
+  }
+
+  function guessMimeTypeFromUrl(url) {
+    const cleanUrl = String(url || '').split('?')[0].toLowerCase();
+    if (cleanUrl.endsWith('.pdf')) return 'application/pdf';
+    if (cleanUrl.endsWith('.doc') || cleanUrl.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    if (cleanUrl.endsWith('.xls') || cleanUrl.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    if (cleanUrl.endsWith('.ppt') || cleanUrl.endsWith('.pptx')) return 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    if (/\.(png|jpg|jpeg|webp|gif)$/i.test(cleanUrl)) return 'image/*';
+    if (/\.(mp4|webm|ogg|mov)$/i.test(cleanUrl)) return 'video/*';
+    return '';
+  }
+
+  function extractDriveFileId(url) {
+    const text = String(url || '');
+    const patterns = [
+      /\/file\/d\/([^/]+)/,
+      /[?&]id=([^&]+)/,
+      /\/d\/([^/]+)\//
+    ];
+    for (const pattern of patterns) {
+      const match = text.match(pattern);
+      if (match && match[1]) return match[1];
+    }
+    return '';
+  }
+
+  function getDrivePreviewUrl(file) {
+    const id = file.drive_file_id || file.fileId || extractDriveFileId(file.drive_url);
+    return id ? `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview` : '';
+  }
+
+  function renderFilePreview(file) {
+    const preview = document.getElementById('fvPreview');
+    if (!preview) return;
+    const mimeType = file.mime_type || guessMimeTypeFromUrl(file.drive_url || '');
+    const url = file.drive_url || file.url || '';
+    const drivePreviewUrl = getDrivePreviewUrl(file);
+    const lowerMime = String(mimeType || '').toLowerCase();
+
+    preview.innerHTML = '';
+
+    if (drivePreviewUrl) {
+      preview.innerHTML = `<iframe src="${drivePreviewUrl}" allow="autoplay; fullscreen" allowfullscreen title="B&S file preview"></iframe>`;
+      return;
+    }
+
+    if (lowerMime.includes('image')) {
+      preview.innerHTML = `<img src="${url}" alt="${file.file_name || 'Preview'}">`;
+      return;
+    }
+
+    if (lowerMime.includes('video')) {
+      preview.innerHTML = `<video src="${url}" controls playsinline></video>`;
+      return;
+    }
+
+    if (lowerMime.includes('pdf')) {
+      preview.innerHTML = `<iframe src="${url}" title="PDF preview"></iframe>`;
+      return;
+    }
+
+    const officeTypes = ['word', 'spreadsheet', 'presentation', 'msword', 'excel', 'powerpoint', 'officedocument'];
+    if (officeTypes.some(type => lowerMime.includes(type)) && url) {
+      const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(url)}`;
+      preview.innerHTML = `<iframe src="${officeUrl}" title="Office document preview"></iframe>`;
+      return;
+    }
+
+    preview.innerHTML = `
+      <div class="fv-unsupported">
+        <strong>المعاينة المباشرة غير متاحة لهذا النوع حاليا.</strong><br>
+        تقدر تستخدم زر التحميل، ولو الملف على Google Drive بصلاحية مناسبة سيظهر داخل الأكاديمية تلقائيا.
+      </div>
+    `;
+  }
 
   closeModal.addEventListener('click', () => {
     modal.classList.remove('active');
+    document.getElementById('fvPreview').innerHTML = '<div class="fv-empty">اختر ملفا لعرضه داخل الأكاديمية.</div>';
   });
 
   // Close on outside click
   window.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.remove('active');
+    if (e.target === modal) {
+      modal.classList.remove('active');
+      document.getElementById('fvPreview').innerHTML = '<div class="fv-empty">اختر ملفا لعرضه داخل الأكاديمية.</div>';
+    }
   });
 
   /* ==========================================
@@ -919,7 +1055,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="fm-icon">${icon}</div>
         <div class="fm-name">${f.name}</div>
         <div class="fm-item-actions">
-          <a class="fm-btn" href="${f.url}" target="_blank">عرض</a>
+          <button class="fm-btn btn-preview-drive-file" data-id="${f.id}" data-name="${f.name}" data-url="${encodeURIComponent(f.url || '')}" data-mime="${f.mimeType || ''}">عرض</button>
           <button class="fm-btn btn-rename" data-id="${f.id}" data-name="${f.name}" data-isfolder="false">تسمية</button>
           <button class="fm-btn btn-archive" data-id="${f.id}" data-isfolder="false">أرشفة</button>
         </div>
@@ -937,6 +1073,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           await fmApiCall({ action: 'rename_item', itemId: btn.dataset.id, newName, isFolder: btn.dataset.isfolder === 'true' });
           loadFolder(currentFolderPath, currentFolderId);
         }
+      });
+    });
+
+    fmGrid.querySelectorAll('.btn-preview-drive-file').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        renderFileViewer({
+          file_name: btn.dataset.name || 'Drive file',
+          file_size: 0,
+          mime_type: btn.dataset.mime || '',
+          drive_url: decodeURIComponent(btn.dataset.url || ''),
+          drive_file_id: btn.dataset.id || ''
+        });
       });
     });
 
