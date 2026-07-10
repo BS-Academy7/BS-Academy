@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let allAcademyFiles = [];
   let onboardingApplications = [];
   let siteContacts = [];
+  let documentSettings = null;
 
   // Check initial auth state
   await checkAuth();
@@ -68,6 +69,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (onboardingNav) onboardingNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
     const contactsNav = document.querySelector('.nav-item[data-tab="contacts"]');
     if (contactsNav) contactsNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
+    const documentsNav = document.querySelector('.nav-item[data-tab="documents"]');
+    if (documentsNav) documentsNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
   }
 
   /* ==========================================
@@ -103,6 +106,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     siteContacts = typeof bsGetSiteContacts === 'function'
       ? await bsGetSiteContacts(true)
       : [];
+    documentSettings = typeof bsGetDocumentSettings === 'function'
+      ? await bsGetDocumentSettings()
+      : null;
     
     // Fetch all academy_files
     const { data: filesData } = await supabaseClient.from('academy_files').select('*');
@@ -111,6 +117,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderRequests(requests);
     renderOnboardingApplications(onboardingApplications);
     renderContacts(siteContacts);
+    renderDocumentSettings(documentSettings);
   }
 
   function renderRequests(requests) {
@@ -391,6 +398,97 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       resetContactForm();
       loadDashboardData();
+    });
+  }
+
+  /* ==========================================
+     Document Settings
+     ========================================== */
+  const documentSettingsForm = document.getElementById('documentSettingsForm');
+  const documentSettingsResetBtn = document.getElementById('documentSettingsResetBtn');
+
+  function renderDocumentSettings(settings) {
+    if (!documentSettingsForm) return;
+    const invoiceTemplate = settings?.invoice_template || {};
+    const officialFooter = settings?.official_footer || {};
+
+    const languageSelect = document.getElementById('docDefaultLanguage');
+    const currencySelect = document.getElementById('docDefaultCurrency');
+    if (languageSelect) {
+      languageSelect.dataset.selected = settings?.default_language || 'ar';
+      if (typeof bsPopulateDocumentLanguageSelect === 'function') {
+        bsPopulateDocumentLanguageSelect(languageSelect, languageSelect.dataset.selected);
+      }
+    }
+    if (currencySelect) {
+      currencySelect.dataset.selected = settings?.default_currency || 'EGP';
+      if (typeof bsPopulateCurrencySelect === 'function') {
+        bsPopulateCurrencySelect(currencySelect, currencySelect.dataset.selected);
+      }
+    }
+
+    document.getElementById('docAllowDualLanguage').checked = settings?.allow_dual_language !== false;
+    document.getElementById('docShowQr').checked = Boolean(invoiceTemplate.show_qr);
+    document.getElementById('docQrPosition').value = invoiceTemplate.qr_position || 'footer';
+    document.getElementById('docOwnerName').value = officialFooter.owner_name || 'Eng/Bahaa Hussein';
+    document.getElementById('docShowOwnerFooter').checked = officialFooter.show_owner_name !== false;
+  }
+
+  function collectDocumentSettings() {
+    return {
+      default_language: document.getElementById('docDefaultLanguage')?.value || 'ar',
+      default_currency: document.getElementById('docDefaultCurrency')?.value || 'EGP',
+      allow_dual_language: document.getElementById('docAllowDualLanguage')?.checked !== false,
+      invoice_template: {
+        show_logo: true,
+        show_qr: document.getElementById('docShowQr')?.checked || false,
+        qr_position: document.getElementById('docQrPosition')?.value || 'footer',
+        layout: 'academy_standard',
+        editable_from_dashboard: true
+      },
+      contract_template: {
+        show_logo: true,
+        show_qr: document.getElementById('docShowQr')?.checked || false,
+        layout: 'academy_contract',
+        editable_from_dashboard: true
+      },
+      official_footer: {
+        owner_name: document.getElementById('docOwnerName')?.value.trim() || 'Eng/Bahaa Hussein',
+        owner_title: 'Academy Owner & General Manager',
+        show_owner_name: document.getElementById('docShowOwnerFooter')?.checked !== false,
+        show_academy_stamp: document.getElementById('docShowOwnerFooter')?.checked !== false,
+        show_owner_signature: document.getElementById('docShowOwnerFooter')?.checked !== false,
+        applies_to: ['invoice', 'contract', 'certificate', 'letter', 'internal_document']
+      }
+    };
+  }
+
+  if (documentSettingsForm) {
+    documentSettingsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = documentSettingsForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      const result = await bsSaveDocumentSettings(collectDocumentSettings());
+      submitBtn.disabled = false;
+      if (result?.error) {
+        alert('فشل حفظ إعدادات المستندات: ' + result.error.message);
+        return;
+      }
+      documentSettings = result.data;
+      renderDocumentSettings(documentSettings);
+      alert('تم حفظ إعدادات الفواتير والمستندات');
+    });
+  }
+
+  if (documentSettingsResetBtn) {
+    documentSettingsResetBtn.addEventListener('click', () => {
+      renderDocumentSettings({
+        default_language: 'ar',
+        default_currency: 'EGP',
+        allow_dual_language: true,
+        invoice_template: { show_qr: false, qr_position: 'footer' },
+        official_footer: { owner_name: 'Eng/Bahaa Hussein', show_owner_name: true }
+      });
     });
   }
 
