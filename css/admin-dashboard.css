@@ -28,14 +28,20 @@ body.admin-body {
 }
 
 .document-settings-form input,
-.document-settings-form select {
+.document-settings-form select,
+.document-settings-form textarea {
   min-height: 44px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  padding: 0 12px;
+  padding: 10px 12px;
   background: #fff;
   color: var(--text);
   font: inherit;
+}
+
+.document-settings-form textarea {
+  resize: vertical;
+  line-height: 1.7;
 }
 
 .document-settings-form .contact-active-row {
@@ -70,8 +76,88 @@ body.admin-body {
   margin-inline-end: 6px;
 }
 
+.admin-warning-box {
+  border: 1px solid #f6d49b;
+  background: #fff8ea;
+  color: #8a4b00;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin: 12px 0 18px;
+  line-height: 1.8;
+}
+
+.management-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+  padding: 16px;
+  border: 1px solid #edf0f5;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  background: #fbfcfe;
+}
+
+.management-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.management-form input,
+.management-form select {
+  min-height: 40px;
+  border: 1px solid #d8e0ea;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.document-live-preview {
+  min-height: 120px;
+  border: 1px solid #d8e0ea;
+  border-radius: 10px;
+  background: #fff;
+  padding: 18px;
+  margin-bottom: 18px;
+  line-height: 1.8;
+}
+
+.document-live-preview .invoice-preview-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #e7ecf3;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.document-live-preview .preview-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed #c8d3e0;
+  text-align: left;
+  direction: ltr;
+  font-family: 'Outfit', sans-serif;
+}
+
+.role-select,
+.status-select {
+  min-width: 130px;
+  min-height: 36px;
+  border: 1px solid #d8e0ea;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font: inherit;
+}
+
 @media (max-width: 760px) {
   .document-settings-form {
+    grid-template-columns: 1fr;
+  }
+
+  .management-form {
     grid-template-columns: 1fr;
   }
 }
