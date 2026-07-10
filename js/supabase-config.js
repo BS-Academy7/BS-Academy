@@ -55,6 +55,10 @@ async function bsSignUp(email, password, fullName, options = {}) {
       data: {
         full_name: fullName,
         whatsapp: options.whatsapp || '',
+        country_code: options.countryCode || 'EG',
+        phone_country_code: options.phoneCountryCode || options.countryCode || 'EG',
+        preferred_language: options.preferredLanguage || 'ar',
+        preferred_currency: options.preferredCurrency || 'EGP',
         account_type: accountType,
         desired_position: options.desiredPosition || '',
         specialty: options.specialty || ''
@@ -62,24 +66,34 @@ async function bsSignUp(email, password, fullName, options = {}) {
     }
   });
   
-  if (!error && data?.user && isGoogleDriveUploadConfigured) {
+  if (!error && data?.user) {
+    const profilePatch = {
+      account_type: accountType,
+      desired_position: options.desiredPosition || null,
+      specialty: options.specialty || null,
+      whatsapp: options.whatsapp || null,
+      country_code: options.countryCode || 'EG',
+      phone_country_code: options.phoneCountryCode || options.countryCode || 'EG',
+      preferred_language: options.preferredLanguage || 'ar',
+      preferred_currency: options.preferredCurrency || 'EGP'
+    };
+
     const peopleFolder = accountType === 'instructor'
       ? '03_Instructors'
       : accountType === 'staff'
         ? '04_Staff'
         : '02_Students';
-    const folderPath = `01_People/${peopleFolder}/${data.user.id} - ${fullName}`;
-    const result = await bsCreateDriveFolder(folderPath);
-    if (result && result.ok) {
-      await supabaseClient.from('profiles').update({
-        drive_folder_id: result.folderId,
-        drive_folder_url: result.url,
-        account_type: accountType,
-        desired_position: options.desiredPosition || null,
-        specialty: options.specialty || null,
-        whatsapp: options.whatsapp || null
-      }).eq('id', data.user.id);
+
+    if (isGoogleDriveUploadConfigured) {
+      const folderPath = `01_People/${peopleFolder}/${data.user.id} - ${fullName}`;
+      const result = await bsCreateDriveFolder(folderPath);
+      if (result && result.ok) {
+        profilePatch.drive_folder_id = result.folderId;
+        profilePatch.drive_folder_url = result.url;
+      }
     }
+
+    await supabaseClient.from('profiles').update(profilePatch).eq('id', data.user.id);
   }
   
   return { data, error };
@@ -130,6 +144,48 @@ async function bsEnsureOnboardingApplication(userId, payload = {}) {
       current_stage_key: 'complete_profile',
       status: 'needs_profile'
     }], { onConflict: 'user_id' })
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+/* ============================================
+   DOCUMENT SETTINGS (language/currency/templates)
+   ============================================ */
+
+async function bsGetDocumentSettings() {
+  if (!supabaseClient) return null;
+  const { data, error } = await supabaseClient
+    .from('academy_document_settings')
+    .select('*')
+    .eq('id', 'default')
+    .single();
+  if (error) {
+    console.warn('[B&S] Could not load document settings', error);
+    return null;
+  }
+  return data;
+}
+
+async function bsSaveDocumentSettings(settings = {}) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+  const currentUser = await bsGetCurrentUser();
+  const payload = {
+    id: 'default',
+    default_language: settings.default_language || 'ar',
+    default_currency: settings.default_currency || 'EGP',
+    allow_dual_language: settings.allow_dual_language !== false,
+    invoice_template: settings.invoice_template || {},
+    contract_template: settings.contract_template || {},
+    official_footer: settings.official_footer || {},
+    updated_by: currentUser ? currentUser.id : null,
+    updated_at: new Date().toISOString()
+  };
+
+  const { data, error } = await supabaseClient
+    .from('academy_document_settings')
+    .upsert([payload], { onConflict: 'id' })
     .select()
     .single();
 
