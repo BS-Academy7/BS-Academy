@@ -7,16 +7,124 @@ document.addEventListener('DOMContentLoaded', async () => {
   const signupMessage = document.getElementById('signupMessage');
   const stagePreviewText = document.getElementById('stagePreviewText');
   const typeCards = document.querySelectorAll('.type-card');
+  const accountSections = document.querySelectorAll('[data-account-section]');
+  const specialtyInput = document.getElementById('signupSpecialty');
+  const desiredPositionWrap = document.getElementById('desiredPositionWrap');
+  const desiredPositionInput = document.getElementById('signupPosition');
 
   const stageText = {
-    student: 'حساب جديد، استكمال بيانات، تفعيل حساب الطالب.',
-    instructor: 'حساب جديد، استكمال بيانات، رفع CV وشهادات، اختبار، مقابلة، مراجعة الإدارة العليا، قبول.',
-    staff: 'حساب جديد، استكمال بيانات، مراجعة الدور المطلوب، تحديد الصلاحيات من الإدارة العليا.'
+    student: 'حساب طالب، استكمال بيانات، ثم تفعيل تجربة الطالب داخل الأكاديمية.',
+    instructor: 'حساب محاضر، استكمال بيانات، رفع CV وشهادات، اختبار أو مقابلة، ثم اعتماد الإدارة العليا.',
+    staff: 'حساب فريق أو إدارة، مراجعة الدور المطلوب، ثم تحديد الصلاحيات من الإدارة العليا فقط.'
+  };
+
+  const fieldCopy = {
+    student: {
+      specialtyPlaceholder: 'مثال: Engineering, High School, Accounting',
+      positionPlaceholder: ''
+    },
+    instructor: {
+      specialtyPlaceholder: 'مثال: Classic Control, Accounting, English',
+      positionPlaceholder: 'محاضر، مدرب، مشرف محتوى...'
+    },
+    staff: {
+      specialtyPlaceholder: 'مثال: إدارة، دعم فني، تنسيق، محتوى',
+      positionPlaceholder: 'منسق، دعم فني، إدارة، مبيعات...'
+    }
   };
 
   function setMessage(el, text, isError = false) {
+    if (!el) return;
     el.textContent = text || '';
     el.classList.toggle('error', Boolean(isError));
+  }
+
+  function showView(name) {
+    tabs.forEach(item => item.classList.toggle('active', item.dataset.authTab === name));
+    views.forEach(view => view.classList.toggle('active', view.dataset.authView === name));
+  }
+
+  function getSelectedAccountType() {
+    return signupForm?.querySelector('input[name="accountType"]:checked')?.value || 'student';
+  }
+
+  function applyAccountType(type) {
+    typeCards.forEach(card => {
+      const input = card.querySelector('input[type="radio"]');
+      const active = input && input.value === type;
+      card.classList.toggle('active', active);
+      if (input) input.checked = active;
+    });
+
+    accountSections.forEach(section => {
+      section.classList.toggle('active', section.dataset.accountSection === type);
+    });
+
+    if (stagePreviewText) stagePreviewText.textContent = stageText[type] || stageText.student;
+    if (specialtyInput) specialtyInput.placeholder = fieldCopy[type]?.specialtyPlaceholder || fieldCopy.student.specialtyPlaceholder;
+
+    const needsPosition = type !== 'student';
+    if (desiredPositionWrap) desiredPositionWrap.hidden = !needsPosition;
+    if (desiredPositionInput) {
+      desiredPositionInput.required = needsPosition;
+      desiredPositionInput.placeholder = fieldCopy[type]?.positionPlaceholder || '';
+      if (!needsPosition) desiredPositionInput.value = '';
+    }
+  }
+
+  function collectRoleDetails(accountType) {
+    const details = [];
+    const pushDetail = (label, value) => {
+      const cleaned = (value || '').trim();
+      if (cleaned) details.push(`${label}: ${cleaned}`);
+    };
+
+    if (accountType === 'student') {
+      pushDetail('Student stage', document.getElementById('signupStudentStage')?.value);
+      pushDetail('Study goal', document.getElementById('signupStudyGoal')?.value);
+    } else if (accountType === 'instructor') {
+      pushDetail('Teaching track', document.getElementById('signupTeachingTrack')?.value);
+      pushDetail('Portfolio/CV', document.getElementById('signupPortfolioUrl')?.value);
+    } else if (accountType === 'staff') {
+      pushDetail('Department', document.getElementById('signupDepartment')?.value);
+      pushDetail('Access reason', document.getElementById('signupAccessReason')?.value);
+    }
+
+    return details.join(' | ');
+  }
+
+  function readCallbackParams() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    return {
+      error: searchParams.get('error') || hashParams.get('error'),
+      errorCode: searchParams.get('error_code') || hashParams.get('error_code'),
+      description: searchParams.get('error_description') || hashParams.get('error_description'),
+      type: searchParams.get('type') || hashParams.get('type'),
+      hasSessionHash: hashParams.has('access_token') || hashParams.has('refresh_token')
+    };
+  }
+
+  function handleAuthCallbackMessage() {
+    const callback = readCallbackParams();
+    if (callback.error) {
+      showView('login');
+      const expired = callback.errorCode === 'otp_expired'
+        || /expired|invalid/i.test(callback.description || '');
+      const message = expired
+        ? 'رابط تفعيل البريد منتهي أو تم استخدامه قبل كده. اطلب رابط جديد أو سجل الحساب مرة أخرى بعد ضبط رابط Supabase.'
+        : `حدث خطأ في تفعيل الحساب: ${callback.description || callback.error}`;
+      setMessage(loginMessage, message, true);
+      return { hasError: true };
+    }
+
+    if (callback.hasSessionHash || callback.type === 'signup') {
+      showView('login');
+      setMessage(loginMessage, 'تم تأكيد البريد بنجاح. لو لم يتم تحويلك تلقائيًا، سجل دخولك الآن.');
+      return { hasSuccess: true };
+    }
+
+    return {};
   }
 
   function getTargetUrl(profile) {
@@ -39,25 +147,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(item => item.classList.remove('active'));
-      views.forEach(view => view.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelector(`[data-auth-view="${tab.dataset.authTab}"]`).classList.add('active');
-    });
+    tab.addEventListener('click', () => showView(tab.dataset.authTab));
   });
 
   typeCards.forEach(card => {
     card.addEventListener('click', () => {
-      typeCards.forEach(item => item.classList.remove('active'));
-      card.classList.add('active');
       const input = card.querySelector('input[type="radio"]');
-      input.checked = true;
-      stagePreviewText.textContent = stageText[input.value] || stageText.student;
+      applyAccountType(input?.value || 'student');
     });
   });
 
-  loginForm.addEventListener('submit', async (event) => {
+  loginForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const submit = loginForm.querySelector('button[type="submit"]');
     submit.disabled = true;
@@ -77,13 +177,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = getTargetUrl(profile);
   });
 
-  signupForm.addEventListener('submit', async (event) => {
+  signupForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const submit = signupForm.querySelector('button[type="submit"]');
     submit.disabled = true;
     setMessage(signupMessage, 'جاري إنشاء الحساب...');
 
-    const accountType = signupForm.querySelector('input[name="accountType"]:checked').value;
+    const accountType = getSelectedAccountType();
     const countryCode = document.getElementById('signupCountry')?.value || 'EG';
     const phoneCountryCode = document.getElementById('signupPhoneCountry')?.value || countryCode;
     const whatsappInputValue = document.getElementById('signupWhatsappLocal')?.value.trim() || '';
@@ -93,6 +193,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const whatsappFull = typeof bsComposeInternationalPhone === 'function'
       ? bsComposeInternationalPhone(phoneCountryCode, whatsappInputValue)
       : document.getElementById('signupWhatsapp').value.trim();
+    const roleDetails = collectRoleDetails(accountType);
+    const baseSpecialty = document.getElementById('signupSpecialty').value.trim();
+    const basePosition = document.getElementById('signupPosition').value.trim();
 
     const payload = {
       fullName: document.getElementById('signupName').value.trim(),
@@ -105,8 +208,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       preferredLanguage: window.currentLang || localStorage.getItem('bs_lang') || document.documentElement.lang || 'ar',
       preferredCurrency: document.getElementById('signupPreferredCurrency')?.value || 'EGP',
       accountType,
-      specialty: document.getElementById('signupSpecialty').value.trim(),
-      desiredPosition: document.getElementById('signupPosition').value.trim()
+      specialty: [baseSpecialty, roleDetails].filter(Boolean).join(' | '),
+      desiredPosition: accountType === 'student' ? roleDetails : basePosition
     };
 
     const { data, error } = await bsSignUp(payload.email, payload.password, payload.fullName, payload);
@@ -120,9 +223,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       await bsEnsureOnboardingApplication(data.user.id, payload);
     }
 
-    setMessage(signupMessage, 'تم إنشاء الحساب. لو مطلوب تأكيد بريد إلكتروني، افتح الإيميل وفعل الحساب ثم سجل دخول.');
+    setMessage(signupMessage, 'تم إنشاء الحساب. افتح رسالة التأكيد من البريد، وبعد التفعيل سجل دخولك من هنا.');
     submit.disabled = false;
   });
 
-  await routeIfLoggedIn();
+  applyAccountType(getSelectedAccountType());
+  const callbackState = handleAuthCallbackMessage();
+  if (!callbackState.hasError) await routeIfLoggedIn();
 });
