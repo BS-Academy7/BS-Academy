@@ -7,6 +7,7 @@
  * - List folder contents
  * - Rename files/folders
  * - Archive files/folders
+ * - Send admin notifications through Telegram and email
  * 
  * INSTRUCTIONS:
  * 1. Copy all code.
@@ -21,7 +22,14 @@ const CONFIG = {
   ROOT_FOLDER_ID: '1hOsiO5fGzPQKC6cchDIp9hwT2LYNNjXR',
   ROOT_FOLDER_NAME: 'B&S Academy Drive',
   ACCESS_TOKEN: 'bs-academy-drive-bridge-2026',
-  ALLOWED_ORIGINS: '*' // Change to your GitHub Pages URL for security if desired
+  ALLOWED_ORIGINS: '*', // Change to your GitHub Pages URL for security if desired
+  TELEGRAM_BOT_TOKEN: '',
+  TELEGRAM_CHAT_ID: '8768737475',
+  ADMIN_EMAILS: [
+    'bs.academy.com@gmail.com',
+    'bahaahussein.com@gmail.com'
+  ],
+  NOTIFICATION_FROM_NAME: 'B&S Academy Notifications'
 };
 
 function doPost(e) {
@@ -45,6 +53,10 @@ function doPost(e) {
         return handleRenameItem(postData);
       case 'archive_item':
         return handleArchiveItem(postData);
+      case 'notify_ondemand':
+        return handleOnDemandNotification(postData);
+      case 'notify_ondemand_email':
+        return handleOnDemandEmailNotification(postData);
       default:
         return respondError('Unknown action: ' + action);
     }
@@ -52,6 +64,149 @@ function doPost(e) {
   } catch (error) {
     return respondError(error.toString());
   }
+}
+
+function handleOnDemandNotification(postData) {
+  const request = postData.request || postData.payload || {};
+  const message = buildOnDemandNotificationMessage(request);
+  const results = {
+    telegram: sendTelegramMessage(message),
+    email: sendAdminEmail(
+      'طلب On-Demand جديد - B&S Academy',
+      message
+    )
+  };
+
+  return respondSuccess({
+    notified: true,
+    results: results
+  });
+}
+
+function handleOnDemandEmailNotification(postData) {
+  const request = postData.request || postData.payload || {};
+  const message = buildOnDemandNotificationMessage(request);
+  const result = sendAdminEmail(
+    'طلب On-Demand جديد - B&S Academy',
+    message
+  );
+
+  return respondSuccess({
+    notified: true,
+    channel: 'email',
+    result: result
+  });
+}
+
+function buildOnDemandNotificationMessage(request) {
+  const createdAt = request.created_at
+    ? formatDateTime(new Date(request.created_at))
+    : formatDateTime(new Date());
+
+  const lines = [
+    '🔔 طلب On-Demand جديد',
+    'B&S Academy',
+    '',
+    '━━━━━━━━━━━━━━',
+    'بيانات الطالب',
+    '• الاسم: ' + safeValue(request.full_name),
+    '• الدولة: ' + formatCountry(request.country_code),
+    '• واتساب: ' + safeValue(request.whatsapp),
+    '• الإيميل: ' + safeValue(request.email),
+    '',
+    'تفاصيل الطلب',
+    '• المرحلة: ' + safeValue(request.academic_level),
+    '• التخصص: ' + safeValue(request.faculty_major),
+    '• المادة: ' + safeValue(request.subject_name),
+    '• الموضوع: ' + safeValue(request.topic_title),
+    '• طريقة الاستلام: ' + formatDelivery(request.delivery_pref),
+    '• وقت الطلب: ' + createdAt,
+    '',
+    'الوصف',
+    safeValue(request.description)
+  ];
+
+  if (request.id) {
+    lines.splice(4, 0, 'رقم الطلب: ' + request.id, '');
+  }
+
+  return lines.join('\n');
+}
+
+function formatCountry(code) {
+  const countries = {
+    EG: 'مصر',
+    SA: 'السعودية',
+    AE: 'الإمارات',
+    KW: 'الكويت',
+    QA: 'قطر',
+    BH: 'البحرين',
+    OM: 'عمان',
+    JO: 'الأردن',
+    IQ: 'العراق',
+    LB: 'لبنان',
+    MA: 'المغرب',
+    DZ: 'الجزائر',
+    TN: 'تونس',
+    US: 'United States',
+    GB: 'United Kingdom',
+    DE: 'Germany',
+    FR: 'France',
+    OTHER: 'دولة أخرى'
+  };
+  return countries[code] || safeValue(code);
+}
+
+function formatDelivery(value) {
+  const map = {
+    recorded: 'فيديو مسجل مخصص',
+    live: 'جلسة مباشرة 1:1',
+    online: 'Online'
+  };
+  return map[value] || safeValue(value);
+}
+
+function sendTelegramMessage(message) {
+  if (!CONFIG.TELEGRAM_BOT_TOKEN || !CONFIG.TELEGRAM_CHAT_ID) {
+    return { ok: false, skipped: true, reason: 'Telegram is not configured' };
+  }
+
+  const url = 'https://api.telegram.org/bot' + CONFIG.TELEGRAM_BOT_TOKEN + '/sendMessage';
+  const response = UrlFetchApp.fetch(url, {
+    method: 'post',
+    contentType: 'application/json',
+    muteHttpExceptions: true,
+    payload: JSON.stringify({
+      chat_id: CONFIG.TELEGRAM_CHAT_ID,
+      text: message,
+      disable_web_page_preview: true
+    })
+  });
+
+  const status = response.getResponseCode();
+  return {
+    ok: status >= 200 && status < 300,
+    status: status,
+    body: response.getContentText().slice(0, 500)
+  };
+}
+
+function sendAdminEmail(subject, message) {
+  if (!CONFIG.ADMIN_EMAILS || !CONFIG.ADMIN_EMAILS.length) {
+    return { ok: false, skipped: true, reason: 'Admin emails are not configured' };
+  }
+
+  MailApp.sendEmail({
+    to: CONFIG.ADMIN_EMAILS.join(','),
+    subject: subject,
+    body: message,
+    name: CONFIG.NOTIFICATION_FROM_NAME
+  });
+
+  return {
+    ok: true,
+    recipients: CONFIG.ADMIN_EMAILS.length
+  };
 }
 
 function handleUpload(postData) {
@@ -326,6 +481,16 @@ function safeSegment(value) {
   return clean || 'Untitled';
 }
 
+function safeValue(value) {
+  if (value === null || value === undefined || value === '') return '-';
+  if (Array.isArray(value)) return value.join(', ');
+  return String(value);
+}
+
+function formatDateTime(date) {
+  return Utilities.formatDate(date, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+}
+
 function respondSuccess(data) {
   return ContentService.createTextOutput(JSON.stringify({
     ok: true,
@@ -346,4 +511,13 @@ function respondError(errorMessage) {
 function doOptions(e) {
   return ContentService.createTextOutput('{"ok":true}')
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function authorizeNotifications() {
+  UrlFetchApp.fetch('https://api.telegram.org', { muteHttpExceptions: true });
+  MailApp.sendEmail({
+    to: Session.getActiveUser().getEmail(),
+    subject: 'B&S Academy notification authorization test',
+    body: 'Authorization test only.'
+  });
 }
