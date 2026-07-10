@@ -41,6 +41,15 @@ img, svg, video {
   max-width: 100%;
 }
 
+img[class*="logo"],
+img[class*="brand-mark"],
+img[class*="seal"],
+.dash-brand img,
+.auth-logo img {
+  object-fit: contain;
+  aspect-ratio: 1;
+}
+
 a {
   color: inherit;
   text-decoration: none;
