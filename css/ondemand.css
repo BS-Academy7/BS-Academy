@@ -342,13 +342,9 @@
   grid-column: 1 / -1;
 }
 
-.phone-combo--locked > select[data-country-select] {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  min-width: 0;
-  opacity: 0;
-  pointer-events: none;
+.phone-combo--locked > select[data-country-select],
+.phone-combo--locked > .dial-code {
+  display: none !important;
 }
 
 .phone-combo [data-local-phone] {
