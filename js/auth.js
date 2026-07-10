@@ -86,9 +86,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const accountType = signupForm.querySelector('input[name="accountType"]:checked').value;
     const countryCode = document.getElementById('signupCountry')?.value || 'EG';
     const phoneCountryCode = document.getElementById('signupPhoneCountry')?.value || countryCode;
-    const whatsappLocal = document.getElementById('signupWhatsappLocal')?.value.trim() || '';
+    const whatsappInputValue = document.getElementById('signupWhatsappLocal')?.value.trim() || '';
+    const whatsappLocal = typeof bsExtractLocalPhone === 'function'
+      ? bsExtractLocalPhone(phoneCountryCode, whatsappInputValue)
+      : whatsappInputValue.replace(/[^\d]/g, '');
     const whatsappFull = typeof bsComposeInternationalPhone === 'function'
-      ? bsComposeInternationalPhone(phoneCountryCode, whatsappLocal)
+      ? bsComposeInternationalPhone(phoneCountryCode, whatsappInputValue)
       : document.getElementById('signupWhatsapp').value.trim();
 
     const payload = {
@@ -99,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       phoneLocal: whatsappLocal,
       countryCode,
       phoneCountryCode,
-      preferredLanguage: document.getElementById('signupPreferredLanguage')?.value || 'ar',
+      preferredLanguage: window.currentLang || localStorage.getItem('bs_lang') || document.documentElement.lang || 'ar',
       preferredCurrency: document.getElementById('signupPreferredCurrency')?.value || 'EGP',
       accountType,
       specialty: document.getElementById('signupSpecialty').value.trim(),
