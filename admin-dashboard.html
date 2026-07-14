@@ -65,6 +65,10 @@
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"></path><path d="M8 8h8"></path><path d="M8 12h8"></path><path d="M8 16h5"></path></svg>
           الفواتير والمستندات
         </a>
+        <a href="#qr-lifecycle" class="nav-item" data-tab="qr-lifecycle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3"></path><path d="M21 14v7h-7"></path></svg>
+          QR Lifecycle
+        </a>
       </nav>
       <div class="sidebar-footer">
         <div class="user-info" id="adminUserInfo">جاري التحميل...</div>
@@ -370,6 +374,66 @@
           </div>
         </div>
 
+        <!-- QR Lifecycle View -->
+        <div id="view-qr-lifecycle" class="admin-view">
+          <div class="card">
+            <div class="section-head">
+              <div>
+                <h2>إدارة دورة حياة QR Code</h2>
+                <p>التحكم في رابط الـ QR القديم: توجيه مباشر، فترة انتقالية بعداد، أو إيقاف كامل وتحويل للدعم.</p>
+              </div>
+            </div>
+
+            <div class="qr-admin-link-box">
+              <span>الرابط الثابت الذي يوضع داخل أي QR Code:</span>
+              <input id="qrLandingLink" type="text" value="https://bs-academy7.github.io/BS-Academy/qr.html" readonly>
+            </div>
+
+            <form id="qrSettingsForm" class="document-settings-form qr-settings-form">
+              <label class="contact-active-row document-wide">
+                <input type="checkbox" id="qrTransitionMode">
+                تشغيل وضع الانتقال إلى منصة/دومين جديد
+              </label>
+              <label>
+                رابط المنصة الحالي
+                <input type="url" id="qrCurrentPlatformUrl" placeholder="https://bs-academy7.github.io/BS-Academy/">
+              </label>
+              <label>
+                رابط المنصة الجديد
+                <input type="url" id="qrNewPlatformUrl" placeholder="https://your-new-domain.com/">
+              </label>
+              <label>
+                تاريخ ووقت انتهاء صلاحية QR القديم
+                <input type="datetime-local" id="qrExpirationTimestamp">
+              </label>
+              <label>
+                رابط الدعم الفني بعد انتهاء الصلاحية
+                <input type="url" id="qrSupportContactUrl" placeholder="https://wa.me/201550755928">
+              </label>
+              <label>
+                رابط صورة QR الجديد
+                <input type="url" id="qrNewQrMediaUrl" placeholder="https://.../new-qr.png">
+              </label>
+              <label>
+                رفع صورة QR جديد
+                <input type="file" id="qrMediaFile" accept="image/*">
+              </label>
+              <div class="qr-preview-card document-wide">
+                <img id="qrAdminPreview" src="" alt="QR preview" hidden>
+                <div>
+                  <strong>طريقة العمل:</strong>
+                  <span>لو وضع الانتقال مغلق، الطالب يدخل مباشرة للرابط الحالي. لو مفتوح، تظهر شاشة تحديث حتى موعد الانتهاء. بعد الانتهاء يظهر زر الدعم فقط.</span>
+                </div>
+              </div>
+              <div class="contact-form-actions">
+                <button type="submit" class="btn btn-primary">حفظ إعدادات QR</button>
+                <button type="button" id="qrPreviewBtn" class="btn btn-outline">فتح صفحة QR للتجربة</button>
+              </div>
+              <p id="qrSettingsStatus" class="qr-settings-status document-wide"></p>
+            </form>
+          </div>
+        </div>
+
         <!-- Files View (Drive Tree Manager) -->
         <div id="view-files" class="admin-view">
           <div class="card file-manager-card">
@@ -423,6 +487,6 @@
     </div>
   </div>
 
-  <script src="js/admin-dashboard.js?v=20260711-viewer-v1"></script>
+  <script src="js/admin-dashboard.js?v=20260713-qr-v1"></script>
 </body>
 </html>

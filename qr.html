@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <title>B&S Academy QR Gateway</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/qr.css?v=20260713-qr-v1">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/supabase-config.js?v=20260713-qr-v1"></script>
+  <script defer src="js/qr-router.js?v=20260713-qr-v1"></script>
+</head>
+<body>
+  <main class="qr-gateway" aria-live="polite">
+    <section id="qrLoading" class="qr-state qr-state-loading" hidden>
+      <img src="images/logo.png" alt="B&S Academy" class="qr-logo">
+      <p>جاري توجيهك إلى منصة B&S Academy...</p>
+    </section>
+
+    <section id="qrTransition" class="qr-state qr-card" hidden>
+      <img src="images/logo.png" alt="B&S Academy" class="qr-logo">
+      <p class="qr-eyebrow">B&S Academy</p>
+      <h1>تحديث رابط المنصة</h1>
+      <p class="qr-copy">
+        تم تجهيز رابط جديد للمنصة. احفظ الـ QR الجديد قبل انتهاء فترة السماح.
+      </p>
+
+      <div class="countdown" aria-label="الوقت المتبقي">
+        <div><strong id="qrDays">00</strong><span>يوم</span></div>
+        <div><strong id="qrHours">00</strong><span>ساعة</span></div>
+        <div><strong id="qrMinutes">00</strong><span>دقيقة</span></div>
+        <div><strong id="qrSeconds">00</strong><span>ثانية</span></div>
+      </div>
+
+      <figure id="qrMediaWrap" class="qr-media" hidden>
+        <img id="qrMediaImage" alt="QR Code الجديد">
+        <figcaption>امسح أو حمّل رمز الدخول الجديد.</figcaption>
+      </figure>
+
+      <div class="qr-actions">
+        <a id="qrNewPlatformBtn" class="btn btn-primary" href="#">دخول المنصة الجديدة</a>
+        <a id="qrDownloadBtn" class="btn btn-outline" href="#" download>تحميل QR الجديد</a>
+      </div>
+    </section>
+
+    <section id="qrExpired" class="qr-state qr-card qr-expired" hidden>
+      <img src="images/logo.png" alt="B&S Academy" class="qr-logo">
+      <p class="qr-eyebrow">B&S Academy</p>
+      <h1>رمز QR غير صالح</h1>
+      <p class="qr-copy">
+        انتهت صلاحية هذا الرمز القديم. تواصل مع الدعم الفني للحصول على الرابط أو الرمز الجديد.
+      </p>
+      <div class="qr-actions">
+        <a id="qrSupportBtn" class="btn btn-primary" href="#">تواصل مع الدعم الفني</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
