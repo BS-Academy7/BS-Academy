@@ -426,6 +426,36 @@ function bsPreferWebpAsset(url) {
   return url.replace(/(images\/(?:logo2?|banner-[^?#"')]+))\.(?:png|jpe?g)(?=([?#]|$))/gi, '$1.webp');
 }
 
+function bsRepairMojibakeText(value) {
+  if (!value || typeof value !== 'string' || !/[ØÙÃÂâ]/.test(value)) return value;
+  const cp1252 = {
+    '€': 0x80, '‚': 0x82, 'ƒ': 0x83, '„': 0x84, '…': 0x85, '†': 0x86, '‡': 0x87,
+    'ˆ': 0x88, '‰': 0x89, 'Š': 0x8A, '‹': 0x8B, 'Œ': 0x8C, 'Ž': 0x8E,
+    '‘': 0x91, '’': 0x92, '“': 0x93, '”': 0x94, '•': 0x95, '–': 0x96, '—': 0x97,
+    '˜': 0x98, '™': 0x99, 'š': 0x9A, '›': 0x9B, 'œ': 0x9C, 'ž': 0x9E, 'Ÿ': 0x9F
+  };
+  const bytes = [];
+  for (const ch of value) {
+    const code = ch.codePointAt(0);
+    if (code <= 0xFF) bytes.push(code);
+    else if (cp1252[ch] !== undefined) bytes.push(cp1252[ch]);
+    else return value;
+  }
+  const decoded = new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+  return decoded.includes('�') ? value : decoded;
+}
+
+function bsNormalizeProgramText(node) {
+  if (!node || typeof node !== 'object') return node;
+  ['title_ar', 'title_en', 'desc_ar', 'desc_en'].forEach(key => {
+    node[key] = bsRepairMojibakeText(node[key]);
+  });
+  node.banner_url = bsPreferWebpAsset(node.banner_url);
+  node.banner = bsPreferWebpAsset(node.banner);
+  if (Array.isArray(node.children)) node.children.forEach(bsNormalizeProgramText);
+  return node;
+}
+
 function getLocalSectorOverviewData() {
   return SECTOR_ORDER.map(key => {
     const s = SECTOR_TRACKS[key];
@@ -437,10 +467,10 @@ function mapLiveSectorRows(rows) {
   return rows.map(row => ({
     key: row.sector_key,
     number: row.sort_order ? `0${row.sort_order} / ${row.sector_key.toUpperCase()}` : row.sector_key.toUpperCase(),
-    title_ar: row.title_ar,
-    title_en: row.title_en,
-    desc_ar: row.desc_ar,
-    desc_en: row.desc_en,
+    title_ar: bsRepairMojibakeText(row.title_ar),
+    title_en: bsRepairMojibakeText(row.title_en),
+    desc_ar: bsRepairMojibakeText(row.desc_ar),
+    desc_en: bsRepairMojibakeText(row.desc_en),
     banner_main: bsPreferWebpAsset(row.banner_url)
   }));
 }
@@ -525,6 +555,7 @@ async function renderSectorDetailPage(sectorKey) {
   // Try the live database first
   if (typeof bsGetSectorProgramTree === 'function' && typeof isSupabaseConfigured !== 'undefined' && isSupabaseConfigured) {
     tree = await bsWithTimeout(bsGetSectorProgramTree(sectorKey), 2500, []);
+    tree = (tree || []).map(bsNormalizeProgramText);
     if (tree && tree.length) {
       // In the recursive model, the sector's own info is the
       // single root row with parent_id = null for this sector_key.
@@ -537,10 +568,10 @@ async function renderSectorDetailPage(sectorKey) {
       if (matchingSector) {
         sectorInfo = {
           number: matchingSector.sort_order ? `0${matchingSector.sort_order} / ${sectorKey.toUpperCase()}` : sectorKey.toUpperCase(),
-          title_ar: matchingSector.title_ar,
-          title_en: matchingSector.title_en,
-          desc_ar: matchingSector.desc_ar,
-          desc_en: matchingSector.desc_en,
+          title_ar: bsRepairMojibakeText(matchingSector.title_ar),
+          title_en: bsRepairMojibakeText(matchingSector.title_en),
+          desc_ar: bsRepairMojibakeText(matchingSector.desc_ar),
+          desc_en: bsRepairMojibakeText(matchingSector.desc_en),
           banner_main: bsPreferWebpAsset(matchingSector.banner_url)
         };
 
