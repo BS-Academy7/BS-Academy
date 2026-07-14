@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const profile = await bsGetProfile(user.id);
     const allowedRoles = ['admin', 'super_admin', 'drive_manager'];
     if (!profile || !allowedRoles.includes(profile.role)) {
-      loginError.textContent = 'Ù‡Ø°Ø§ Ø§Ù„Ø­Ø³Ø§Ø¨ Ù„Ø§ ÙŠÙ…Ù„Ùƒ ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©. Ø§Ø·Ù„Ø¨ ØªØ±Ù‚ÙŠØ© Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ© Ù…Ù† Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù„ÙŠØ§.';
+      loginError.textContent = 'هذا الحساب لا يملك صلاحيات الإدارة. اطلب ترقية الصلاحية من الإدارة العليا.';
       await bsSignOut();
       showLoginGate();
       return;
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tbody.innerHTML = '';
 
     if (!profiles || profiles.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø­Ø³Ø§Ø¨Ø§Øª Ø¸Ø§Ù‡Ø±Ø© Ø­Ø§Ù„ÙŠØ§</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد حسابات ظاهرة حاليا</td></tr>';
       return;
     }
 
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const status = profile.profile_status || 'active';
       tr.innerHTML = `
         <td>
-          <strong>${profile.full_name || 'Ø¨Ø¯ÙˆÙ† Ø§Ø³Ù…'}</strong><br>
+          <strong>${profile.full_name || 'بدون اسم'}</strong><br>
           <small>${profile.display_title || profile.whatsapp || profile.id}</small>
         </td>
         <td>
@@ -176,8 +176,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         </td>
         <td><span class="status-badge ${profile.onboarding_status || 'needs_profile'}">${formatStatus(profile.onboarding_status)}</span></td>
         <td class="action-cell">
-          <button class="fm-btn btn-save-user" data-id="${profile.id}">Ø­ÙØ¸</button>
-          <button class="fm-btn btn-request-delete-user" data-id="${profile.id}">Ø·Ù„Ø¨ Ø­Ø°Ù Auth</button>
+          <button class="fm-btn btn-save-user" data-id="${profile.id}">حفظ</button>
+          <button class="fm-btn btn-request-delete-user" data-id="${profile.id}">طلب حذف Auth</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         btn.disabled = false;
         if (result?.error) {
-          alert('ÙØ´Ù„ Ø­ÙØ¸ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…: ' + result.error.message);
+          alert('فشل حفظ المستخدم: ' + result.error.message);
           return;
         }
         loadDashboardData();
@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.addEventListener('click', async () => {
         const profile = managedProfiles.find(item => item.id === btn.dataset.id);
         if (!profile) return;
-        if (!confirm('Ø³ÙŠØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨ Ø­Ø°Ù Auth Ù„Ù‡Ø°Ø§ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…. Ø§Ù„Ø­Ø°Ù Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ ÙŠØ­ØªØ§Ø¬ Edge Function Ø¢Ù…Ù†Ø©. Ù‡Ù„ ØªØ¤ÙƒØ¯ØŸ')) return;
+        if (!confirm('سيتم تسجيل طلب حذف Auth لهذا المستخدم. الحذف النهائي يحتاج Edge Function آمنة. هل تؤكد؟')) return;
         btn.disabled = true;
         const result = await bsCreateAdminUserAction({
           action_type: 'delete_auth_user',
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         await bsUpdateManagedProfile(profile.id, { profile_status: 'disabled', onboarding_status: 'disabled' });
         btn.disabled = false;
-        if (result?.error) alert('ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨ Ø§Ù„Ø­Ø°Ù: ' + result.error.message);
+        if (result?.error) alert('فشل تسجيل طلب الحذف: ' + result.error.message);
         loadDashboardData();
       });
     });
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function formatAccountType(type) {
-    const map = { student: 'Ø·Ø§Ù„Ø¨', instructor: 'Ù…Ø­Ø§Ø¶Ø±', staff: 'ÙØ±ÙŠÙ‚ / Ø¥Ø¯Ø§Ø±Ø©' };
+    const map = { student: 'طالب', instructor: 'محاضر', staff: 'فريق / إدارة' };
     return map[type] || type || '-';
   }
 
@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const role = document.getElementById('managedUserRole').value;
       const accountType = document.getElementById('managedUserAccountType').value;
       if (!email) {
-        alert('Ø§ÙƒØªØ¨ Ø¥ÙŠÙ…ÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø£ÙˆÙ„Ø§');
+        alert('اكتب إيميل المستخدم أولا');
         return;
       }
 
@@ -265,11 +265,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       submitBtn.disabled = false;
       if (result?.error) {
-        alert('ÙØ´Ù„ ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…: ' + result.error.message);
+        alert('فشل تسجيل طلب إنشاء المستخدم: ' + result.error.message);
         return;
       }
       adminUserActionForm.reset();
-      alert('ØªÙ… ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…. Ø§Ù„ØªÙ†ÙÙŠØ° Ø§Ù„Ù†Ù‡Ø§Ø¦ÙŠ ÙŠØ­ØªØ§Ø¬ Edge Function Ø¢Ù…Ù†Ø© Ø¨Ù…ÙØªØ§Ø­ service_role.');
+      alert('تم تسجيل طلب إنشاء المستخدم. التنفيذ النهائي يحتاج Edge Function آمنة بمفتاح service_role.');
     });
   }
 
@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tbody.innerHTML = '';
 
     if (requests.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Ù„Ø§ ØªÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ø­Ø§Ù„ÙŠØ§Ù‹</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد طلبات حالياً</td></tr>';
       return;
     }
 
@@ -292,16 +292,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       let attachmentsHtml = '';
       if (reqFiles.length > 0) {
         reqFiles.forEach(file => {
-          attachmentsHtml += `<button class="attachment-btn" onclick="openFileViewer('${file.id}')">ðŸ“Ž ${file.file_name.substring(0, 15)}...</button>`;
+          attachmentsHtml += `<button class="attachment-btn" onclick="openFileViewer('${file.id}')">📎 ${file.file_name.substring(0, 15)}...</button>`;
         });
       } else if (req.attachment_urls && req.attachment_urls.length > 0) {
         // Fallback for old requests that weren't registered in academy_files
         req.attachment_urls.forEach((url, idx) => {
           const escapedUrl = encodeURIComponent(url);
-          attachmentsHtml += `<button class="attachment-btn" onclick="openExternalFileViewer('${escapedUrl}', 'Ù…Ø±ÙÙ‚ ${idx+1}', '')">ðŸ”— Ù…Ø±ÙÙ‚ ${idx+1} (Ù‚Ø¯ÙŠÙ…)</button>`;
+          attachmentsHtml += `<button class="attachment-btn" onclick="openExternalFileViewer('${escapedUrl}', 'مرفق ${idx+1}', '')">🔗 مرفق ${idx+1} (قديم)</button>`;
         });
       } else {
-        attachmentsHtml = '<span style="color:#888;">Ù„Ø§ ÙŠÙˆØ¬Ø¯</span>';
+        attachmentsHtml = '<span style="color:#888;">لا يوجد</span>';
       }
 
       tr.innerHTML = `
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         </td>
         <td>${req.academic_level}</td>
         <td>${attachmentsHtml}</td>
-        <td><span class="status-badge ${req.status}">${req.status === 'new' ? 'Ø¬Ø¯ÙŠØ¯' : req.status}</span></td>
+        <td><span class="status-badge ${req.status}">${req.status === 'new' ? 'جديد' : req.status}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tbody.innerHTML = '';
 
     if (!applications || applications.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªØ³Ø¬ÙŠÙ„Ø§Øª Ø¬Ø¯ÙŠØ¯Ø© Ø­Ø§Ù„ÙŠØ§Ù‹</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">لا توجد تسجيلات جديدة حالياً</td></tr>';
       return;
     }
 
@@ -337,15 +337,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tr = document.createElement('tr');
       const date = new Date(app.submitted_at).toLocaleDateString('ar-EG');
       const typeLabel = app.account_type === 'instructor'
-        ? 'Ù…Ø­Ø§Ø¶Ø±'
+        ? 'محاضر'
         : app.account_type === 'staff'
-          ? 'Ø¨ÙˆØ²ÙŠØ´Ù† / ÙØ±ÙŠÙ‚'
-          : 'Ø·Ø§Ù„Ø¨';
+          ? 'بوزيشن / فريق'
+          : 'طالب';
 
       tr.innerHTML = `
         <td>${date}</td>
         <td>
-          <strong>${profile.full_name || 'Ù…Ø³ØªØ®Ø¯Ù… Ø¬Ø¯ÙŠØ¯'}</strong><br>
+          <strong>${profile.full_name || 'مستخدم جديد'}</strong><br>
           <small>${profile.whatsapp || ''}</small>
         </td>
         <td>${typeLabel}</td>
@@ -356,8 +356,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td>${formatStage(app.current_stage_key)}</td>
         <td><span class="status-badge ${app.status}">${formatStatus(app.status)}</span></td>
         <td class="action-cell">
-          <button class="fm-btn btn-next-stage" data-id="${app.id}">Ù…Ø±Ø­Ù„Ø© ØªØ§Ù„ÙŠØ©</button>
-          <button class="fm-btn btn-approve" data-id="${app.id}">Ù‚Ø¨ÙˆÙ„ Ù…Ø¨Ø§Ø´Ø±</button>
+          <button class="fm-btn btn-next-stage" data-id="${app.id}">مرحلة تالية</button>
+          <button class="fm-btn btn-approve" data-id="${app.id}">قبول مباشر</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -385,10 +385,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.addEventListener('click', async () => {
         const app = onboardingApplications.find(item => item.id === btn.dataset.id);
         if (!app) return;
-        if (!confirm('ØªØ£ÙƒÙŠØ¯ Ù‚Ø¨ÙˆÙ„ Ù‡Ø°Ø§ Ø§Ù„Ø­Ø³Ø§Ø¨ Ù…Ø¨Ø§Ø´Ø±Ø©ØŸ')) return;
+        if (!confirm('تأكيد قبول هذا الحساب مباشرة؟')) return;
         btn.disabled = true;
         const result = await bsApproveOnboardingApplication(app);
-        if (result?.error) alert('ÙØ´Ù„ Ø§Ù„Ù‚Ø¨ÙˆÙ„: ' + result.error.message);
+        if (result?.error) alert('فشل القبول: ' + result.error.message);
         loadDashboardData();
       });
     });
@@ -396,27 +396,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function formatStage(stage) {
     const map = {
-      complete_profile: 'Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø¨ÙŠØ§Ù†Ø§Øª',
-      documents: 'Ø±ÙØ¹ Ù…Ø³ØªÙ†Ø¯Ø§Øª',
-      technical_test: 'Ø§Ø®ØªØ¨Ø§Ø± ÙÙ†ÙŠ',
-      interview: 'Ù…Ù‚Ø§Ø¨Ù„Ø©',
-      final_review: 'Ù…Ø±Ø§Ø¬Ø¹Ø© Ù†Ù‡Ø§Ø¦ÙŠØ©',
-      permission_review: 'Ù…Ø±Ø§Ø¬Ø¹Ø© ØµÙ„Ø§Ø­ÙŠØ§Øª',
-      approved: 'Ù…Ù‚Ø¨ÙˆÙ„'
+      complete_profile: 'استكمال بيانات',
+      documents: 'رفع مستندات',
+      technical_test: 'اختبار فني',
+      interview: 'مقابلة',
+      final_review: 'مراجعة نهائية',
+      permission_review: 'مراجعة صلاحيات',
+      approved: 'مقبول'
     };
     return map[stage] || stage || '-';
   }
 
   function formatStatus(status) {
     const map = {
-      needs_profile: 'Ù†Ø§Ù‚Øµ Ø¨ÙŠØ§Ù†Ø§Øª',
-      in_review: 'ØªØ­Øª Ø§Ù„Ù…Ø±Ø§Ø¬Ø¹Ø©',
-      pending_documents: 'Ù…Ø·Ù„ÙˆØ¨ Ù…Ø³ØªÙ†Ø¯Ø§Øª',
-      pending_test: 'Ø§Ø®ØªØ¨Ø§Ø±',
-      pending_interview: 'Ù…Ù‚Ø§Ø¨Ù„Ø©',
-      approved: 'Ù…Ù‚Ø¨ÙˆÙ„',
-      rejected: 'Ù…Ø±ÙÙˆØ¶',
-      disabled: 'Ù…Ø¹Ø·Ù„'
+      needs_profile: 'ناقص بيانات',
+      in_review: 'تحت المراجعة',
+      pending_documents: 'مطلوب مستندات',
+      pending_test: 'اختبار',
+      pending_interview: 'مقابلة',
+      approved: 'مقبول',
+      rejected: 'مرفوض',
+      disabled: 'معطل'
     };
     return map[status] || status || '-';
   }
@@ -459,7 +459,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tbody.innerHTML = '';
 
     if (!contacts || contacts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Ù„Ø§ ØªÙˆØ¬Ø¯ ÙˆØ³Ø§Ø¦Ù„ ØªÙˆØ§ØµÙ„ Ø¨Ø¹Ø¯</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد وسائل تواصل بعد</td></tr>';
       return;
     }
 
@@ -470,10 +470,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td>${contact.label_ar || contact.label_en || '-'}</td>
         <td><a class="contact-link-preview" href="${contact.href}" target="_blank" rel="noopener">${contact.href}</a></td>
         <td>${contact.sort_order || 1}</td>
-        <td><span class="status-badge ${contact.is_active ? 'approved' : 'rejected'}">${contact.is_active ? 'Ø¸Ø§Ù‡Ø±' : 'Ù…Ø®ÙÙŠ'}</span></td>
+        <td><span class="status-badge ${contact.is_active ? 'approved' : 'rejected'}">${contact.is_active ? 'ظاهر' : 'مخفي'}</span></td>
         <td class="action-cell">
-          <button class="fm-btn btn-edit-contact" data-id="${contact.id}">ØªØ¹Ø¯ÙŠÙ„</button>
-          <button class="fm-btn btn-delete-contact" data-id="${contact.id}">Ø­Ø°Ù</button>
+          <button class="fm-btn btn-edit-contact" data-id="${contact.id}">تعديل</button>
+          <button class="fm-btn btn-delete-contact" data-id="${contact.id}">حذف</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -489,10 +489,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     tbody.querySelectorAll('.btn-delete-contact').forEach(btn => {
       btn.addEventListener('click', async () => {
-        if (!confirm('ØªØ£ÙƒÙŠØ¯ Ø­Ø°Ù ÙˆØ³ÙŠÙ„Ø© Ø§Ù„ØªÙˆØ§ØµÙ„ØŸ')) return;
+        if (!confirm('تأكيد حذف وسيلة التواصل؟')) return;
         btn.disabled = true;
         const result = await bsDeleteSiteContact(btn.dataset.id);
-        if (result?.error) alert('ÙØ´Ù„ Ø§Ù„Ø­Ø°Ù: ' + result.error.message);
+        if (result?.error) alert('فشل الحذف: ' + result.error.message);
         loadDashboardData();
       });
     });
@@ -527,7 +527,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const id = document.getElementById('contactId').value;
 
       if (!href || !label) {
-        alert('Ø§ÙƒØªØ¨ Ø§Ù„Ø§Ø³Ù… ÙˆØ§Ù„Ø±Ø§Ø¨Ø· Ø£ÙˆÙ„Ø§');
+        alert('اكتب الاسم والرابط أولا');
         return;
       }
 
@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       submitBtn.disabled = false;
       if (result?.error) {
-        alert('ÙØ´Ù„ Ø­ÙØ¸ ÙˆØ³ÙŠÙ„Ø© Ø§Ù„ØªÙˆØ§ØµÙ„: ' + result.error.message);
+        alert('فشل حفظ وسيلة التواصل: ' + result.error.message);
         return;
       }
 
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('docShowQr').checked = Boolean(invoiceTemplate.show_qr);
     document.getElementById('docQrPosition').value = invoiceTemplate.qr_position || 'footer';
     document.getElementById('docBankDetails').value = formatBankingDetails(invoiceTemplate.banking_details || settings?.banking_details || {});
-    document.getElementById('docInvoiceTermsAr').value = invoiceTemplate.terms_ar || 'ØªØ¹ØªØ¨Ø± Ù‡Ø°Ù‡ Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø±Ø³Ù…ÙŠØ© Ø¨Ø¹Ø¯ Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© ÙˆØ®ØªÙ… Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ©.';
+    document.getElementById('docInvoiceTermsAr').value = invoiceTemplate.terms_ar || 'تعتبر هذه الفاتورة رسمية بعد اعتماد الإدارة وختم الأكاديمية.';
     document.getElementById('docInvoiceTermsEn').value = invoiceTemplate.terms_en || 'This invoice is official after management approval and academy stamp.';
     document.getElementById('docOwnerName').value = officialFooter.owner_name || 'Eng/Bahaa Hussein';
     document.getElementById('docShowOwnerFooter').checked = officialFooter.show_owner_name !== false;
@@ -666,7 +666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!result?.error && typeof bsUpsertDocumentTemplate === 'function') {
         await bsUpsertDocumentTemplate({
           template_type: 'invoice',
-          name_ar: 'ØªÙ…Ø¨Ù„Øª ÙØ§ØªÙˆØ±Ø© B&S Ø§Ù„Ø±Ø³Ù…ÙŠ',
+          name_ar: 'تمبلت فاتورة B&S الرسمي',
           name_en: 'Official B&S Invoice Template',
           language_mode: settingsPayload.allow_dual_language ? 'dual' : settingsPayload.default_language,
           default_currency: settingsPayload.default_currency,
@@ -683,14 +683,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       submitBtn.disabled = false;
       if (result?.error) {
-        alert('ÙØ´Ù„ Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª: ' + result.error.message);
+        alert('فشل حفظ إعدادات المستندات: ' + result.error.message);
         return;
       }
       documentSettings = result.data;
       renderDocumentSettings(documentSettings);
       documentTemplates = typeof bsGetDocumentTemplates === 'function' ? await bsGetDocumentTemplates() : [];
       renderDocumentTemplates(documentTemplates);
-      alert('ØªÙ… Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ÙÙˆØ§ØªÙŠØ± ÙˆØ§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª');
+      alert('تم حفظ إعدادات الفواتير والمستندات');
     });
   }
 
@@ -725,20 +725,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             <img src="images/logo.webp" alt="B&S Academy">
             <div>
               <strong>B&S Academy</strong><br>
-              <span>Learning Â· Growth Â· Solutions</span>
+              <span>Learning · Growth · Solutions</span>
             </div>
           </div>
           <div class="invoice-title">
             <strong>INVOICE</strong>
-            <span>ÙØ§ØªÙˆØ±Ø© Ø±Ø³Ù…ÙŠØ©</span>
+            <span>فاتورة رسمية</span>
           </div>
         </div>
         <div class="invoice-meta-grid">
           <div class="invoice-box">
-            <strong>Bill To / Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¹Ù…ÙŠÙ„</strong><br>
+            <strong>Bill To / بيانات العميل</strong><br>
             Student Name<br>
             student@example.com<br>
-            Country / Ø§Ù„Ø¯ÙˆÙ„Ø©
+            Country / الدولة
           </div>
           <div class="invoice-box">
             <strong>Invoice Details</strong><br>
@@ -762,14 +762,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               <td>${settings.default_currency} 1,000.00</td>
             </tr>
             <tr class="invoice-total-row">
-              <td colspan="2">Total / Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ</td>
+              <td colspan="2">Total / الإجمالي</td>
               <td>${settings.default_currency} 1,000.00</td>
             </tr>
           </tbody>
         </table>
         <div class="invoice-terms">
           <p><strong>Banking:</strong><br>${bankText ? bankText.replace(/\n/g, '<br>') : 'Not configured yet'}</p>
-          <p><strong>Ø§Ù„Ø´Ø±ÙˆØ·:</strong> ${invoice.terms_ar || '-'}</p>
+          <p><strong>الشروط:</strong> ${invoice.terms_ar || '-'}</p>
           <p><strong>Terms:</strong> ${invoice.terms_en || '-'}</p>
           <p><strong>QR:</strong> ${invoice.show_qr ? invoice.qr_position : 'Hidden'}</p>
         </div>
@@ -790,7 +790,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     tbody.innerHTML = '';
 
     if (!templates || templates.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Ù„Ø§ ØªÙˆØ¬Ø¯ ØªÙ…Ø¨Ù„ØªØ§Øª Ù…Ø­ÙÙˆØ¸Ø© Ø¨Ø¹Ø¯</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد تمبلتات محفوظة بعد</td></tr>';
       return;
     }
 
@@ -804,8 +804,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         </td>
         <td>${template.language_mode || '-'}</td>
         <td>${template.default_currency || '-'}</td>
-        <td>${template.is_default ? 'Ù†Ø¹Ù…' : 'Ù„Ø§'}</td>
-        <td><span class="status-badge ${template.is_active ? 'approved' : 'rejected'}">${template.is_active ? 'Ù†Ø´Ø·' : 'Ù…Ø¹Ø·Ù„'}</span></td>
+        <td>${template.is_default ? 'نعم' : 'لا'}</td>
+        <td><span class="status-badge ${template.is_active ? 'approved' : 'rejected'}">${template.is_active ? 'نشط' : 'معطل'}</span></td>
       `;
       tbody.appendChild(tr);
     });
@@ -892,7 +892,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       const submitBtn = qrSettingsForm.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
-      setQrStatus('Ø¬Ø§Ø±ÙŠ Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª QR...');
+      setQrStatus('جاري حفظ إعدادات QR...');
 
       const payload = collectQrRoutingSettings();
       const file = qrMediaFile?.files?.[0];
@@ -900,7 +900,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const uploadResult = await bsUploadQrMedia(file);
         if (uploadResult?.error) {
           submitBtn.disabled = false;
-          setQrStatus('ÙØ´Ù„ Ø±ÙØ¹ ØµÙˆØ±Ø© QR: ' + uploadResult.error.message, 'error');
+          setQrStatus('فشل رفع صورة QR: ' + uploadResult.error.message, 'error');
           return;
         }
         payload.new_qr_media_url = uploadResult.url;
@@ -913,13 +913,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       submitBtn.disabled = false;
       if (result?.error) {
-        setQrStatus('ÙØ´Ù„ Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª QR: ' + result.error.message, 'error');
+        setQrStatus('فشل حفظ إعدادات QR: ' + result.error.message, 'error');
         return;
       }
 
       qrRoutingSettings = result.data;
       renderQrRoutingSettings(qrRoutingSettings);
-      setQrStatus('ØªÙ… Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª QR Ø¨Ù†Ø¬Ø§Ø­. Ø§Ø³ØªØ®Ø¯Ù… Ø§Ù„Ø±Ø§Ø¨Ø· Ø§Ù„Ø«Ø§Ø¨Øª ÙÙŠ Ø£ÙŠ QR Code.', 'success');
+      setQrStatus('تم حفظ إعدادات QR بنجاح. استخدم الرابط الثابت في أي QR Code.', 'success');
     });
   }
 
@@ -1046,28 +1046,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     preview.innerHTML = `
       <div class="fv-unsupported">
-        <strong>Ø§Ù„Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„Ù…Ø¨Ø§Ø´Ø±Ø© ØºÙŠØ± Ù…ØªØ§Ø­Ø© Ù„Ù‡Ø°Ø§ Ø§Ù„Ù†ÙˆØ¹ Ø­Ø§Ù„ÙŠØ§.</strong><br>
-        ØªÙ‚Ø¯Ø± ØªØ³ØªØ®Ø¯Ù… Ø²Ø± Ø§Ù„ØªØ­Ù…ÙŠÙ„ØŒ ÙˆÙ„Ùˆ Ø§Ù„Ù…Ù„Ù Ø¹Ù„Ù‰ Google Drive Ø¨ØµÙ„Ø§Ø­ÙŠØ© Ù…Ù†Ø§Ø³Ø¨Ø© Ø³ÙŠØ¸Ù‡Ø± Ø¯Ø§Ø®Ù„ Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ© ØªÙ„Ù‚Ø§Ø¦ÙŠØ§.
+        <strong>المعاينة المباشرة غير متاحة لهذا النوع حاليا.</strong><br>
+        تقدر تستخدم زر التحميل، ولو الملف على Google Drive بصلاحية مناسبة سيظهر داخل الأكاديمية تلقائيا.
       </div>
     `;
   }
 
   closeModal.addEventListener('click', () => {
     modal.classList.remove('active');
-    document.getElementById('fvPreview').innerHTML = '<div class="fv-empty">Ø§Ø®ØªØ± Ù…Ù„ÙØ§ Ù„Ø¹Ø±Ø¶Ù‡ Ø¯Ø§Ø®Ù„ Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ©.</div>';
+    document.getElementById('fvPreview').innerHTML = '<div class="fv-empty">اختر ملفا لعرضه داخل الأكاديمية.</div>';
   });
 
   // Close on outside click
   window.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.remove('active');
-      document.getElementById('fvPreview').innerHTML = '<div class="fv-empty">Ø§Ø®ØªØ± Ù…Ù„ÙØ§ Ù„Ø¹Ø±Ø¶Ù‡ Ø¯Ø§Ø®Ù„ Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ©.</div>';
+      document.getElementById('fvPreview').innerHTML = '<div class="fv-empty">اختر ملفا لعرضه داخل الأكاديمية.</div>';
     }
   });
 
   /* ==========================================
      Drive Tree Manager Logic
-     (Inside DOMContentLoaded â€” safe access to DOM)
+     (Inside DOMContentLoaded — safe access to DOM)
      ========================================== */
   const fmGrid = document.getElementById('fmGrid');
   const fmLoading = document.getElementById('fmLoading');
@@ -1107,7 +1107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fmGrid.style.display = 'grid';
 
     if (!result || !result.ok) {
-      fmGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: red;">ÙØ´Ù„ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ø¬Ù„Ø¯ â€” ØªØ£ÙƒØ¯ Ù…Ù† Ø¥Ø¹Ø¯Ø§Ø¯ Ø§Ù„Ù€ Apps Script</div>';
+      fmGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: red;">فشل تحميل المجلد — تأكد من إعداد الـ Apps Script</div>';
       return;
     }
 
@@ -1118,11 +1118,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   function renderBreadcrumb(path) {
     if (!fmBreadcrumb) return;
     if (!path) {
-      fmBreadcrumb.innerHTML = `<span class="fm-crumb active" data-path="">ðŸ“ B&S Academy</span>`;
+      fmBreadcrumb.innerHTML = `<span class="fm-crumb active" data-path="">📁 B&S Academy</span>`;
       return;
     }
     const parts = path.split('/').filter(p => p.trim());
-    let html = `<span class="fm-crumb" data-path="">ðŸ“ B&S Academy</span>`;
+    let html = `<span class="fm-crumb" data-path="">📁 B&S Academy</span>`;
     let current = '';
     parts.forEach((p, idx) => {
       current += (current ? '/' : '') + p;
@@ -1146,7 +1146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fmGrid.innerHTML = '';
     
     if (folders.length === 0 && files.length === 0) {
-      fmGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">Ø§Ù„Ù…Ø¬Ù„Ø¯ ÙØ§Ø±Øº</div>';
+      fmGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;">المجلد فارغ</div>';
       return;
     }
 
@@ -1154,11 +1154,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const el = document.createElement('div');
       el.className = 'fm-item' + (f.isArchived ? ' archived' : '');
       el.innerHTML = `
-        <div class="fm-icon">ðŸ“</div>
+        <div class="fm-icon">📁</div>
         <div class="fm-name">${f.name}</div>
         <div class="fm-item-actions">
-          <button class="fm-btn btn-rename" data-id="${f.id}" data-name="${f.name}" data-isfolder="true">ØªØ³Ù…ÙŠØ©</button>
-          <button class="fm-btn btn-archive" data-id="${f.id}" data-isfolder="true">Ø£Ø±Ø´ÙØ©</button>
+          <button class="fm-btn btn-rename" data-id="${f.id}" data-name="${f.name}" data-isfolder="true">تسمية</button>
+          <button class="fm-btn btn-archive" data-id="${f.id}" data-isfolder="true">أرشفة</button>
         </div>
       `;
       el.addEventListener('dblclick', () => {
@@ -1171,18 +1171,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     files.forEach(f => {
       const el = document.createElement('div');
       el.className = 'fm-item' + (f.isArchived ? ' archived' : '');
-      let icon = 'ðŸ“„';
-      if (f.mimeType && f.mimeType.includes('image')) icon = 'ðŸ–¼ï¸';
-      else if (f.mimeType && f.mimeType.includes('video')) icon = 'ðŸŽ¬';
-      else if (f.mimeType && f.mimeType.includes('pdf')) icon = 'ðŸ“‘';
+      let icon = '📄';
+      if (f.mimeType && f.mimeType.includes('image')) icon = '🖼️';
+      else if (f.mimeType && f.mimeType.includes('video')) icon = '🎬';
+      else if (f.mimeType && f.mimeType.includes('pdf')) icon = '📑';
 
       el.innerHTML = `
         <div class="fm-icon">${icon}</div>
         <div class="fm-name">${f.name}</div>
         <div class="fm-item-actions">
-          <button class="fm-btn btn-preview-drive-file" data-id="${f.id}" data-name="${f.name}" data-url="${encodeURIComponent(f.url || '')}" data-mime="${f.mimeType || ''}">Ø¹Ø±Ø¶</button>
-          <button class="fm-btn btn-rename" data-id="${f.id}" data-name="${f.name}" data-isfolder="false">ØªØ³Ù…ÙŠØ©</button>
-          <button class="fm-btn btn-archive" data-id="${f.id}" data-isfolder="false">Ø£Ø±Ø´ÙØ©</button>
+          <button class="fm-btn btn-preview-drive-file" data-id="${f.id}" data-name="${f.name}" data-url="${encodeURIComponent(f.url || '')}" data-mime="${f.mimeType || ''}">عرض</button>
+          <button class="fm-btn btn-rename" data-id="${f.id}" data-name="${f.name}" data-isfolder="false">تسمية</button>
+          <button class="fm-btn btn-archive" data-id="${f.id}" data-isfolder="false">أرشفة</button>
         </div>
       `;
       fmGrid.appendChild(el);
@@ -1192,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         const oldName = btn.dataset.name;
-        const newName = prompt('Ø£Ø¯Ø®Ù„ Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ø¬Ø¯ÙŠØ¯:', oldName);
+        const newName = prompt('أدخل الاسم الجديد:', oldName);
         if (newName && newName !== oldName) {
           btn.textContent = '...';
           await fmApiCall({ action: 'rename_item', itemId: btn.dataset.id, newName, isFolder: btn.dataset.isfolder === 'true' });
@@ -1217,7 +1217,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     fmGrid.querySelectorAll('.btn-archive').forEach(btn => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
-        if (confirm('Ù‡Ù„ Ø£Ù†Øª Ù…ØªØ£ÙƒØ¯ Ù…Ù† Ø£Ø±Ø´ÙØ© Ù‡Ø°Ø§ Ø§Ù„Ø¹Ù†ØµØ±ØŸ')) {
+        if (confirm('هل أنت متأكد من أرشفة هذا العنصر؟')) {
           btn.textContent = '...';
           await fmApiCall({ action: 'archive_item', itemId: btn.dataset.id, isFolder: btn.dataset.isfolder === 'true' });
           loadFolder(currentFolderPath, currentFolderId);
@@ -1231,7 +1231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (fmBtnCreateFolder) {
     fmBtnCreateFolder.addEventListener('click', async () => {
-      const name = prompt('Ø§Ø³Ù… Ø§Ù„ÙÙˆÙ„Ø¯Ø± Ø§Ù„Ø¬Ø¯ÙŠØ¯:');
+      const name = prompt('اسم الفولدر الجديد:');
       if (!name) return;
       const newPath = currentFolderPath ? currentFolderPath + '/' + name : name;
       fmBtnCreateFolder.disabled = true;
@@ -1240,7 +1240,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (res && res.ok) {
         loadFolder(currentFolderPath, currentFolderId);
       } else {
-        alert('ÙØ´Ù„ Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„ÙÙˆÙ„Ø¯Ø±!');
+        alert('فشل إنشاء الفولدر!');
       }
     });
   }
@@ -1265,12 +1265,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!file) return;
 
       fmBtnUpload.disabled = true;
-      fmBtnUpload.textContent = 'Ø¬Ø§Ø±ÙŠ Ø§Ù„Ø±ÙØ¹...';
+      fmBtnUpload.textContent = 'جاري الرفع...';
 
       if (typeof bsFileToBase64 !== 'function') {
         alert('Missing bsFileToBase64 helper');
         fmBtnUpload.disabled = false;
-        fmBtnUpload.textContent = 'Ø±ÙØ¹ Ù…Ù„Ù Ù‡Ù†Ø§';
+        fmBtnUpload.textContent = 'رفع ملف هنا';
         return;
       }
 
@@ -1285,13 +1285,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       fmBtnUpload.disabled = false;
-      fmBtnUpload.textContent = 'Ø±ÙØ¹ Ù…Ù„Ù Ù‡Ù†Ø§';
+      fmBtnUpload.textContent = 'رفع ملف هنا';
       fmUploadInput.value = '';
 
       if (res && res.ok) {
         loadFolder(currentFolderPath, currentFolderId);
       } else {
-        alert('ÙØ´Ù„ Ø±ÙØ¹ Ø§Ù„Ù…Ù„Ù!');
+        alert('فشل رفع الملف!');
       }
     });
   }
