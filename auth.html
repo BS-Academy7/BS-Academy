@@ -20,66 +20,66 @@
         <img src="images/logo.webp" alt="B&S Academy" class="auth-logo">
         <div>
           <p class="brand-kicker">B&S Academy</p>
-          <h1>Ø¨ÙˆØ§Ø¨Ø© Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ©</h1>
+          <h1>بوابة حسابات الأكاديمية</h1>
         </div>
       </div>
 
       <div class="auth-tabs" role="tablist" aria-label="Account access">
-        <button type="button" class="auth-tab active" data-auth-tab="login">ØªØ³Ø¬ÙŠÙ„ Ø¯Ø®ÙˆÙ„</button>
-        <button type="button" class="auth-tab" data-auth-tab="signup">Ø­Ø³Ø§Ø¨ Ø¬Ø¯ÙŠØ¯</button>
+        <button type="button" class="auth-tab active" data-auth-tab="login">تسجيل دخول</button>
+        <button type="button" class="auth-tab" data-auth-tab="signup">حساب جديد</button>
       </div>
 
       <form id="loginForm" class="auth-form active" data-auth-view="login">
         <label>
-          Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ
+          البريد الإلكتروني
           <input type="email" id="loginEmail" autocomplete="email" required>
         </label>
         <label>
-          ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±
+          كلمة المرور
           <input type="password" id="loginPassword" autocomplete="current-password" required>
         </label>
-        <button type="submit" class="auth-submit">Ø¯Ø®ÙˆÙ„</button>
+        <button type="submit" class="auth-submit">دخول</button>
         <p id="loginMessage" class="auth-message"></p>
       </form>
 
       <form id="signupForm" class="auth-form" data-auth-view="signup">
-        <div class="account-types" aria-label="Ù†ÙˆØ¹ Ø§Ù„Ø­Ø³Ø§Ø¨">
+        <div class="account-types" aria-label="نوع الحساب">
           <label class="type-card active">
             <input type="radio" name="accountType" value="student" checked>
-            <span>Ø·Ø§Ù„Ø¨</span>
-            <small>ØªØ³Ø¬ÙŠÙ„ Ø³Ø±ÙŠØ¹ Ø«Ù… Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø¨ÙŠØ§Ù†Ø§Øª.</small>
+            <span>طالب</span>
+            <small>تسجيل سريع ثم استكمال بيانات.</small>
           </label>
           <label class="type-card">
             <input type="radio" name="accountType" value="instructor">
-            <span>Ù…Ø­Ø§Ø¶Ø±</span>
-            <small>Ø¨ÙŠØ§Ù†Ø§ØªØŒ Ù…Ø±ÙÙ‚Ø§ØªØŒ Ø§Ø®ØªØ¨Ø§Ø±ØŒ Ù…Ù‚Ø§Ø¨Ù„Ø©ØŒ Ù‚Ø¨ÙˆÙ„.</small>
+            <span>محاضر</span>
+            <small>بيانات، مرفقات، اختبار، مقابلة، قبول.</small>
           </label>
           <label class="type-card">
             <input type="radio" name="accountType" value="staff">
-            <span>Ø¨ÙˆØ²ÙŠØ´Ù† / ÙØ±ÙŠÙ‚</span>
-            <small>ÙŠØ­ØªØ§Ø¬ Ù…ÙˆØ§ÙÙ‚Ø© ÙˆØµÙ„Ø§Ø­ÙŠØ§Øª Ù…Ù† Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù„ÙŠØ§.</small>
+            <span>بوزيشن / فريق</span>
+            <small>يحتاج موافقة وصلاحيات من الإدارة العليا.</small>
           </label>
         </div>
 
         <div class="form-grid">
           <label>
-            Ø§Ù„Ø§Ø³Ù… Ø§Ù„ÙƒØ§Ù…Ù„
+            الاسم الكامل
             <input type="text" id="signupName" autocomplete="name" required>
           </label>
           <label>
-            Ø§Ù„Ø¨Ø±ÙŠØ¯ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ
+            البريد الإلكتروني
             <input type="email" id="signupEmail" autocomplete="email" required>
           </label>
           <label>
-            ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ±
+            كلمة المرور
             <input type="password" id="signupPassword" autocomplete="new-password" minlength="6" required>
           </label>
           <label>
-            Ø§Ù„Ø¯ÙˆÙ„Ø©
+            الدولة
             <select id="signupCountry" data-country-select data-selected="EG"></select>
           </label>
           <label class="phone-combo phone-combo--locked" data-country-phone-group>
-            ÙˆØ§ØªØ³Ø§Ø¨
+            واتساب
             <select id="signupPhoneCountry" data-country-select data-selected="EG"></select>
             <span class="dial-code" data-dial-label>+20</span>
             <input type="tel" id="signupWhatsappLocal" autocomplete="tel" data-local-phone placeholder="1xx xxx xxxx">
@@ -87,65 +87,65 @@
             <input type="hidden" id="signupPreferredCurrency" data-country-currency value="EGP">
           </label>
           <label>
-            Ø§Ù„ØªØ®ØµØµ
-            <input type="text" id="signupSpecialty" placeholder="Ù…Ø«Ø§Ù„: Automation, Accounting, English">
+            التخصص
+            <input type="text" id="signupSpecialty" placeholder="مثال: Automation, Accounting, English">
           </label>
           <label id="desiredPositionWrap">
-            Ø§Ù„Ø¨ÙˆØ²ÙŠØ´Ù† Ø§Ù„Ù…Ø·Ù„ÙˆØ¨
-            <input type="text" id="signupPosition" placeholder="Ù…Ø­Ø§Ø¶Ø±ØŒ Ù…Ù†Ø³Ù‚ØŒ Ø¯Ø¹Ù… ÙÙ†ÙŠ...">
+            البوزيشن المطلوب
+            <input type="text" id="signupPosition" placeholder="محاضر، منسق، دعم فني...">
           </label>
         </div>
 
         <div class="account-section active" data-account-section="student">
-          <strong>Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø·Ø§Ù„Ø¨</strong>
+          <strong>بيانات الطالب</strong>
           <div class="form-grid">
             <label>
-              Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø¯Ø±Ø§Ø³ÙŠØ© / Ø§Ù„Ù…Ø³ØªÙˆÙ‰
-              <input type="text" id="signupStudentStage" placeholder="Ù…Ø«Ø§Ù„: Ø«Ø§Ù†ÙˆÙŠØŒ Ø¬Ø§Ù…Ø¹Ø©ØŒ Ø®Ø±ÙŠØ¬ØŒ Ù…ÙˆØ¸Ù">
+              المرحلة الدراسية / المستوى
+              <input type="text" id="signupStudentStage" placeholder="مثال: ثانوي، جامعة، خريج، موظف">
             </label>
             <label>
-              Ù‡Ø¯Ù Ø§Ù„ØªØ¹Ù„Ù…
-              <input type="text" id="signupStudyGoal" placeholder="Ù…Ø«Ø§Ù„: ÙƒÙˆØ±Ø³ØŒ Ù…Ø´Ø±ÙˆØ¹ ØªØ®Ø±Ø¬ØŒ Ø¯Ø¹Ù… Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠ">
+              هدف التعلم
+              <input type="text" id="signupStudyGoal" placeholder="مثال: كورس، مشروع تخرج، دعم أكاديمي">
             </label>
           </div>
         </div>
 
         <div class="account-section" data-account-section="instructor">
-          <strong>Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ù…Ø­Ø§Ø¶Ø±</strong>
+          <strong>بيانات المحاضر</strong>
           <div class="form-grid">
             <label>
-              Ù…Ø¬Ø§Ù„ Ø§Ù„ØªØ¯Ø±ÙŠØ³
-              <input type="text" id="signupTeachingTrack" placeholder="Ù…Ø«Ø§Ù„: PLC, Accounting, English">
+              مجال التدريس
+              <input type="text" id="signupTeachingTrack" placeholder="مثال: PLC, Accounting, English">
             </label>
             <label>
-              Ø±Ø§Ø¨Ø· Ø£Ø¹Ù…Ø§Ù„ / CV
+              رابط أعمال / CV
               <input type="url" id="signupPortfolioUrl" placeholder="https://...">
             </label>
           </div>
-          <p class="section-note">Ø¨Ø¹Ø¯ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙŠØªÙ… Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø§Ù„Ù…Ø±ÙÙ‚Ø§ØªØŒ Ø«Ù… Ø§Ø®ØªØ¨Ø§Ø± Ø£Ùˆ Ù…Ù‚Ø§Ø¨Ù„Ø© Ø­Ø³Ø¨ Ù‚Ø±Ø§Ø± Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù„ÙŠØ§.</p>
+          <p class="section-note">بعد التسجيل يتم استكمال المرفقات، ثم اختبار أو مقابلة حسب قرار الإدارة العليا.</p>
         </div>
 
         <div class="account-section" data-account-section="staff">
-          <strong>Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ÙØ±ÙŠÙ‚ / Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©</strong>
+          <strong>بيانات الفريق / الإدارة</strong>
           <div class="form-grid">
             <label>
-              Ø§Ù„Ù‚Ø³Ù… Ø§Ù„Ù…Ø·Ù„ÙˆØ¨
-              <input type="text" id="signupDepartment" placeholder="Ù…Ø«Ø§Ù„: Ø¥Ø¯Ø§Ø±Ø©ØŒ Ø¯Ø¹Ù… ÙÙ†ÙŠØŒ Ù…Ø¨ÙŠØ¹Ø§ØªØŒ Ù…Ø­ØªÙˆÙ‰">
+              القسم المطلوب
+              <input type="text" id="signupDepartment" placeholder="مثال: إدارة، دعم فني، مبيعات، محتوى">
             </label>
             <label>
-              Ø³Ø¨Ø¨ Ø·Ù„Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©
-              <input type="text" id="signupAccessReason" placeholder="Ø§Ø´Ø±Ø­ Ø¨Ø§Ø®ØªØµØ§Ø± Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø·Ù„ÙˆØ¨">
+              سبب طلب الصلاحية
+              <input type="text" id="signupAccessReason" placeholder="اشرح باختصار الدور المطلوب">
             </label>
           </div>
-          <p class="section-note">Ø£ÙŠ ØµÙ„Ø§Ø­ÙŠØ§Øª Ø¥Ø¯Ø§Ø±ÙŠØ© Ù„Ø§ ØªÙÙØ¹Ù‘Ù„ ØªÙ„Ù‚Ø§Ø¦ÙŠÙ‹Ø§ØŒ ÙˆÙ„Ø§Ø²Ù… Ù…ÙˆØ§ÙÙ‚Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù„ÙŠØ§.</p>
+          <p class="section-note">أي صلاحيات إدارية لا تُفعّل تلقائيًا، ولازم موافقة الإدارة العليا.</p>
         </div>
 
         <div class="stage-preview" id="stagePreview">
-          <strong>Ù…Ø³Ø§Ø± Ø§Ù„ØªØ³Ø¬ÙŠÙ„:</strong>
-          <span id="stagePreviewText">Ø­Ø³Ø§Ø¨ Ø¬Ø¯ÙŠØ¯ØŒ Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø¨ÙŠØ§Ù†Ø§ØªØŒ ØªÙØ¹ÙŠÙ„ Ø­Ø³Ø§Ø¨ Ø§Ù„Ø·Ø§Ù„Ø¨.</span>
+          <strong>مسار التسجيل:</strong>
+          <span id="stagePreviewText">حساب جديد، استكمال بيانات، تفعيل حساب الطالب.</span>
         </div>
 
-        <button type="submit" class="auth-submit">Ø¥Ù†Ø´Ø§Ø¡ Ø§Ù„Ø­Ø³Ø§Ø¨</button>
+        <button type="submit" class="auth-submit">إنشاء الحساب</button>
         <p id="signupMessage" class="auth-message"></p>
       </form>
     </section>
