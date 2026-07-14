@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   color-scheme: light dark;
   --qr-navy: #071f3d;
   --qr-blue: #0e5b94;
@@ -32,7 +32,7 @@ body {
   padding: 24px;
   background:
     linear-gradient(180deg, rgba(7, 31, 61, 0.82), rgba(7, 31, 61, 0.96)),
-    url("../images/banner-ondemand.jpg") center / cover;
+    url("../images/banner-ondemand.webp") center / cover;
 }
 
 .qr-state {
