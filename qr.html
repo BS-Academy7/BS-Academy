@@ -10,24 +10,24 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/qr.css?v=20260713-qr-v1">
+  <link rel="stylesheet" href="css/qr.css?v=20260714-loading-v1">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/supabase-config.js?v=20260713-qr-v1"></script>
-  <script defer src="js/qr-router.js?v=20260713-qr-v1"></script>
+  <script defer src="js/qr-router.js?v=20260714-loading-v1"></script>
 </head>
 <body>
   <main class="qr-gateway" aria-live="polite">
     <section id="qrLoading" class="qr-state qr-state-loading" hidden>
       <img src="images/logo.png" alt="B&S Academy" class="qr-logo">
-      <p>جاري توجيهك إلى منصة B&S Academy...</p>
+      <p class="qr-loading-message">جاري توجيهك إلى B&S Academy<span class="qr-loading-dots" aria-hidden="true"><span></span><span></span><span></span></span></p>
     </section>
 
     <section id="qrTransition" class="qr-state qr-card" hidden>
       <img src="images/logo.png" alt="B&S Academy" class="qr-logo">
       <p class="qr-eyebrow">B&S Academy</p>
-      <h1>تحديث رابط المنصة</h1>
+      <h1>تحديث الرابط</h1>
       <p class="qr-copy">
-        تم تجهيز رابط جديد للمنصة. احفظ الـ QR الجديد قبل انتهاء فترة السماح.
+        تم تجهيز رابط جديد. احفظ الـ QR الجديد قبل انتهاء فترة السماح.
       </p>
 
       <div class="countdown" aria-label="الوقت المتبقي">
@@ -43,7 +43,7 @@
       </figure>
 
       <div class="qr-actions">
-        <a id="qrNewPlatformBtn" class="btn btn-primary" href="#">دخول المنصة الجديدة</a>
+        <a id="qrNewPlatformBtn" class="btn btn-primary" href="#">دخول الرابط الجديد</a>
         <a id="qrDownloadBtn" class="btn btn-outline" href="#" download>تحميل QR الجديد</a>
       </div>
     </section>
