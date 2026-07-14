@@ -1,4 +1,4 @@
--- ============================================
+﻿-- ============================================
 -- B&S Academy — Supabase Database Schema
 -- ============================================
 -- Run this in: Supabase Dashboard > SQL Editor
@@ -7,6 +7,8 @@
 --   2. Editable site content (admin panel)
 --   3. On-Demand request logging (mirrors Google Sheet)
 -- ============================================
+
+create extension if not exists pgcrypto;
 
 -- ---------------------------------------------
 -- 1. STUDENT PROFILES
@@ -281,8 +283,8 @@ insert into public.programs (id, parent_id, sector_key, title_ar, title_en, desc
 -- bulk INSERT above doesn't include banner_url — keeps the insert
 -- statement simple and lets banners be added independently, exactly
 -- like the admin panel would do it later for any new sector).
-update public.programs set banner_url = 'images/banner-accounting-main.jpg' where id = '00000000-0000-0000-0000-000000000002';
-update public.programs set banner_url = 'images/banner-kids-main.jpg' where id = '00000000-0000-0000-0000-000000000005';
+update public.programs set banner_url = 'images/banner-accounting-main.webp' where id = '00000000-0000-0000-0000-000000000002';
+update public.programs set banner_url = 'images/banner-kids-main.webp' where id = '00000000-0000-0000-0000-000000000005';
 
 -- Engineering Sciences sector — theoretical courses only
 -- (Industrial Automation now lives in its own sector, see below)
@@ -299,41 +301,32 @@ insert into public.programs (parent_id, sector_key, title_ar, title_en, sort_ord
 -- prerequisites system for IIoT, see below)
 -- ---------------------------------------------
 insert into public.programs (id, parent_id, sector_key, title_ar, title_en, desc_ar, desc_en, sort_order) values
-  ('au000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000006', 'automation', 'التحكم الكلاسيكي ومحركات الدفع', 'Classic Control & Motor Drives', 'المخططات الكهربائية، تصميم اللوحات، الكونتاكتورات، وطرق بدء المحركات', 'Electrical diagrams, panel design, contactors, and motor starting methods', 1),
-  ('au000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000006', 'automation', 'أجهزة القياس والتحكم الصناعي', 'Industrial Instrumentation', 'معايرة حساسات الضغط والحرارة والتدفق، والتعامل مع الإشارات التناظرية والرقمية', 'Calibrating pressure, temperature, and flow sensors; analog/digital signal handling', 2),
-  ('au000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'automation', 'برمجة الـ PLC المتقدم', 'Advanced PLC Programming', 'لغة السلم (Ladder Logic)، بيئة TIA Portal، العمليات التتابعية', 'Ladder Logic, TIA Portal environment, sequential operations', 3),
-  ('au000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000006', 'automation', 'تصميم واجهات المستخدم HMI', 'HMI Design', 'تصميم الشاشات التفاعلية وربطها بالـ PLC', 'Designing interactive screens and linking them to PLCs', 4),
-  ('au000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000006', 'automation', 'احتراف أنظمة SCADA', 'Complete SCADA Mastery', 'ربط خطوط الإنتاج، إدارة الإنذارات، والأرشفة الأولية', 'Connecting production lines, alarm management, and initial archiving', 5),
-  ('au000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000006', 'automation', 'التحكم المؤسسي وإدارة البيانات', 'AVEVA & PI System Mastery', null, null, 6),
-  ('au000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000006', 'automation', 'إنترنت الأشياء الصناعي والثورة الصناعية الرابعة', 'IIoT & Industry 4.0', 'ربط أرض المصنع بالأنظمة السحابية وتحليل البيانات الذكية', 'Connecting the factory floor to cloud systems and smart data analysis', 7);
+  ('a0000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000006', 'automation', 'التحكم الكلاسيكي ومحركات الدفع', 'Classic Control & Motor Drives', 'المخططات الكهربائية، تصميم اللوحات، الكونتاكتورات، وطرق بدء المحركات', 'Electrical diagrams, panel design, contactors, and motor starting methods', 1),
+  ('a0000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000006', 'automation', 'أجهزة القياس والتحكم الصناعي', 'Industrial Instrumentation', 'معايرة حساسات الضغط والحرارة والتدفق، والتعامل مع الإشارات التناظرية والرقمية', 'Calibrating pressure, temperature, and flow sensors; analog/digital signal handling', 2),
+  ('a0000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000006', 'automation', 'برمجة الـ PLC المتقدم', 'Advanced PLC Programming', 'لغة السلم (Ladder Logic)، بيئة TIA Portal، العمليات التتابعية', 'Ladder Logic, TIA Portal environment, sequential operations', 3),
+  ('a0000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000006', 'automation', 'تصميم واجهات المستخدم HMI', 'HMI Design', 'تصميم الشاشات التفاعلية وربطها بالـ PLC', 'Designing interactive screens and linking them to PLCs', 4),
+  ('a0000000-0000-0000-0000-000000000005', '00000000-0000-0000-0000-000000000006', 'automation', 'احتراف أنظمة SCADA', 'Complete SCADA Mastery', 'ربط خطوط الإنتاج، إدارة الإنذارات، والأرشفة الأولية', 'Connecting production lines, alarm management, and initial archiving', 5),
+  ('a0000000-0000-0000-0000-000000000006', '00000000-0000-0000-0000-000000000006', 'automation', 'التحكم المؤسسي وإدارة البيانات', 'AVEVA & PI System Mastery', null, null, 6),
+  ('a0000000-0000-0000-0000-000000000007', '00000000-0000-0000-0000-000000000006', 'automation', 'إنترنت الأشياء الصناعي والثورة الصناعية الرابعة', 'IIoT & Industry 4.0', 'ربط أرض المصنع بالأنظمة السحابية وتحليل البيانات الذكية', 'Connecting the factory floor to cloud systems and smart data analysis', 7);
 
 -- AVEVA & PI System Mastery's children (program 6 branches into 4)
 insert into public.programs (id, parent_id, sector_key, title_ar, title_en, sort_order) values
-  ('au000000-0000-0000-0000-000000000008', 'au000000-0000-0000-0000-000000000006', 'automation', 'تصميم واجهات المراقبة التقليدية', 'AVEVA InTouch HMI', 1),
-  ('au000000-0000-0000-0000-000000000009', 'au000000-0000-0000-0000-000000000006', 'automation', 'منصة النظام', 'AVEVA System Platform', 2),
-  ('au000000-0000-0000-0000-00000000000a', 'au000000-0000-0000-0000-000000000006', 'automation', 'الأرشفة المحلية للعمليات', 'AVEVA Historian', 3),
-  ('au000000-0000-0000-0000-00000000000b', 'au000000-0000-0000-0000-000000000006', 'automation', 'إدارة البيانات المؤسسية وتحليلها', 'AVEVA PI System', 4);
+  ('a0000000-0000-0000-0000-000000000008', 'a0000000-0000-0000-0000-000000000006', 'automation', 'تصميم واجهات المراقبة التقليدية', 'AVEVA InTouch HMI', 1),
+  ('a0000000-0000-0000-0000-000000000009', 'a0000000-0000-0000-0000-000000000006', 'automation', 'منصة النظام', 'AVEVA System Platform', 2),
+  ('a0000000-0000-0000-0000-00000000000a', 'a0000000-0000-0000-0000-000000000006', 'automation', 'الأرشفة المحلية للعمليات', 'AVEVA Historian', 3),
+  ('a0000000-0000-0000-0000-00000000000b', 'a0000000-0000-0000-0000-000000000006', 'automation', 'إدارة البيانات المؤسسية وتحليلها', 'AVEVA PI System', 4);
 
 -- AVEVA System Platform's own two children (3 levels deep)
 insert into public.programs (parent_id, sector_key, title_ar, title_en, sort_order) values
-  ('au000000-0000-0000-0000-000000000009', 'automation', 'خادم التطبيقات', 'Application Server', 1),
-  ('au000000-0000-0000-0000-000000000009', 'automation', 'واجهات التشغيل الرقمية (OMI)', 'OMI - Operations Management Interface', 2);
+  ('a0000000-0000-0000-0000-000000000009', 'automation', 'خادم التطبيقات', 'Application Server', 1),
+  ('a0000000-0000-0000-0000-000000000009', 'automation', 'واجهات التشغيل الرقمية (OMI)', 'OMI - Operations Management Interface', 2);
 
 -- IIoT & Industry 4.0's children (program 7 branches into 3)
 insert into public.programs (parent_id, sector_key, title_ar, title_en, desc_ar, desc_en, sort_order) values
-  ('au000000-0000-0000-0000-000000000007', 'automation', 'الشبكات الصناعية وحوسبة الحافة', 'Industrial Networking & Edge Computing', 'بروتوكولات OPC UA, MQTT، بوابات الحافة، وبرمجة Node-RED', 'OPC UA, MQTT protocols, Edge Gateways, and Node-RED programming', 1),
-  ('au000000-0000-0000-0000-000000000007', 'automation', 'المنصات السحابية ولوحات القياس', 'Cloud IoT & Dashboards', 'ربط بيانات المصنع بـ AWS IoT أو Azure، ولوحات مراقبة باستخدام Grafana', 'Connecting factory data to AWS IoT or Azure, and Grafana dashboards', 2),
-  ('au000000-0000-0000-0000-000000000007', 'automation', 'التصنيع الذكي والتوأم الرقمي', 'Smart Manufacturing & Digital Twin', 'الذكاء الاصطناعي على البيانات الصناعية، الصيانة التنبؤية، ومفاهيم التوأم الرقمي', 'AI on industrial data, predictive maintenance, and Digital Twin concepts', 3);
+  ('a0000000-0000-0000-0000-000000000007', 'automation', 'الشبكات الصناعية وحوسبة الحافة', 'Industrial Networking & Edge Computing', 'بروتوكولات OPC UA, MQTT، بوابات الحافة، وبرمجة Node-RED', 'OPC UA, MQTT protocols, Edge Gateways, and Node-RED programming', 1),
+  ('a0000000-0000-0000-0000-000000000007', 'automation', 'المنصات السحابية ولوحات القياس', 'Cloud IoT & Dashboards', 'ربط بيانات المصنع بـ AWS IoT أو Azure، ولوحات مراقبة باستخدام Grafana', 'Connecting factory data to AWS IoT or Azure, and Grafana dashboards', 2),
+  ('a0000000-0000-0000-0000-000000000007', 'automation', 'التصنيع الذكي والتوأم الرقمي', 'Smart Manufacturing & Digital Twin', 'الذكاء الاصطناعي على البيانات الصناعية، الصيانة التنبؤية، ومفاهيم التوأم الرقمي', 'AI on industrial data, predictive maintenance, and Digital Twin concepts', 3);
 
--- THE FLEXIBLE PREREQUISITE LINK: IIoT (program 7) requires
--- BOTH Advanced PLC Programming (3) AND Complete SCADA Mastery (5)
--- at 70%+, regardless of their position in the tree. This is the
--- real-world example that justifies the program_prerequisites
--- table's existence (a simple sequential/sibling lock could not
--- express "requires two specific programs from earlier branches").
-insert into public.program_prerequisites (program_id, requires_program_id, required_percent) values
-  ('au000000-0000-0000-0000-000000000007', 'au000000-0000-0000-0000-000000000003', 70),
-  ('au000000-0000-0000-0000-000000000007', 'au000000-0000-0000-0000-000000000005', 70);
 
 -- ---------------------------------------------
 -- Smart Accounting sector — FULL curriculum structure
@@ -362,11 +355,11 @@ insert into public.programs (id, parent_id, sector_key, node_type, title_ar, tit
   ('ac000000-0000-0000-0000-000000000004', '00000000-0000-0000-0000-000000000002', 'accounting', 'stage', 'المرحلة النهائية: مشروع التخرج', 'Final Stage: Graduation Project', 5);
 
 -- Banner images for the 5 accounting stages
-update public.programs set banner_url = 'images/banner-accounting-stage0.jpg' where id = 'ac000000-0000-0000-0000-000000000000';
-update public.programs set banner_url = 'images/banner-accounting-stage1.jpg' where id = 'ac000000-0000-0000-0000-000000000001';
-update public.programs set banner_url = 'images/banner-accounting-stage2.jpg' where id = 'ac000000-0000-0000-0000-000000000002';
-update public.programs set banner_url = 'images/banner-accounting-stage3.jpg' where id = 'ac000000-0000-0000-0000-000000000003';
-update public.programs set banner_url = 'images/banner-accounting-final.jpg' where id = 'ac000000-0000-0000-0000-000000000004';
+update public.programs set banner_url = 'images/banner-accounting-stage0.webp' where id = 'ac000000-0000-0000-0000-000000000000';
+update public.programs set banner_url = 'images/banner-accounting-stage1.webp' where id = 'ac000000-0000-0000-0000-000000000001';
+update public.programs set banner_url = 'images/banner-accounting-stage2.webp' where id = 'ac000000-0000-0000-0000-000000000002';
+update public.programs set banner_url = 'images/banner-accounting-stage3.webp' where id = 'ac000000-0000-0000-0000-000000000003';
+update public.programs set banner_url = 'images/banner-accounting-final.webp' where id = 'ac000000-0000-0000-0000-000000000004';
 
 -- Stage 0 courses: The Foundation
 insert into public.programs (parent_id, sector_key, node_type, title_ar, title_en, sort_order) values
@@ -420,8 +413,8 @@ insert into public.programs (parent_id, sector_key, title_ar, title_en, desc_ar,
 
 -- Kids sector's existing tracks (with banners already supplied)
 insert into public.programs (parent_id, sector_key, title_ar, title_en, desc_ar, desc_en, banner_url, sort_order) values
-  ('00000000-0000-0000-0000-000000000005', 'kids', 'البرمجة التفاعلية والذكاء الاصطناعي', 'Interactive Programming & AI', 'من أول لعبة يبنيها الطفل بـ Scratch لحد أول خطوة في عالم الذكاء الاصطناعي', 'From a child''s first Scratch game to first steps into AI', 'images/banner-kids-programming-ai.jpg', 1),
-  ('00000000-0000-0000-0000-000000000005', 'kids', 'الإنجليزية التفاعلية', 'Interactive English', 'Phonics، القصص التفاعلية، والمحادثة بطريقة مرحة ومشجعة', 'Phonics, interactive storytelling, and fun conversation practice', 'images/banner-kids-english.jpg', 2);
+  ('00000000-0000-0000-0000-000000000005', 'kids', 'البرمجة التفاعلية والذكاء الاصطناعي', 'Interactive Programming & AI', 'من أول لعبة يبنيها الطفل بـ Scratch لحد أول خطوة في عالم الذكاء الاصطناعي', 'From a child''s first Scratch game to first steps into AI', 'images/banner-kids-programming-ai.webp', 1),
+  ('00000000-0000-0000-0000-000000000005', 'kids', 'الإنجليزية التفاعلية', 'Interactive English', 'Phonics، القصص التفاعلية، والمحادثة بطريقة مرحة ومشجعة', 'Phonics, interactive storytelling, and fun conversation practice', 'images/banner-kids-english.webp', 2);
 
 -- ---------------------------------------------
 -- EXAMPLE ONLY (commented out) — this shows how
@@ -767,6 +760,16 @@ create policy "Admins manage prerequisites"
   );
 
 
+-- THE FLEXIBLE PREREQUISITE LINK: IIoT (program 7) requires
+-- BOTH Advanced PLC Programming (3) AND Complete SCADA Mastery (5)
+-- at 70%+, regardless of their position in the tree. This is the
+-- real-world example that justifies the program_prerequisites
+-- table's existence (a simple sequential/sibling lock could not
+-- express "requires two specific programs from earlier branches").
+insert into public.program_prerequisites (program_id, requires_program_id, required_percent) values
+  ('a0000000-0000-0000-0000-000000000007', 'a0000000-0000-0000-0000-000000000003', 70),
+  ('a0000000-0000-0000-0000-000000000007', 'a0000000-0000-0000-0000-000000000005', 70);
+
 -- ============================================
 -- 17. PROGRAM EXAMS (academy-wide exam system —
 -- two kinds: 'entry' gates access to a program/sector
@@ -830,3 +833,4 @@ create policy "Admins view all attempts"
   using (
     exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
   );
+
