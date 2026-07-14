@@ -602,6 +602,66 @@ async function bsUploadImage(file, folder = 'site-content', metadata = {}) {
 }
 
 /* ============================================
+   QR LIFECYCLE SETTINGS
+   ============================================ */
+
+async function bsGetQrRoutingSettings() {
+  if (!supabaseClient) return null;
+  const { data, error } = await supabaseClient
+    .from('qr_routing_settings')
+    .select('*')
+    .eq('id', 'main')
+    .single();
+
+  if (error) {
+    console.warn('[B&S] Could not load QR routing settings', error);
+    return null;
+  }
+
+  return data;
+}
+
+async function bsSaveQrRoutingSettings(settings = {}) {
+  if (!supabaseClient) return { error: { message: 'Supabase not configured yet' } };
+
+  const user = await bsGetCurrentUser();
+  const payload = {
+    id: 'main',
+    transition_mode: Boolean(settings.transition_mode),
+    current_platform_url: settings.current_platform_url || 'https://bs-academy7.github.io/BS-Academy/',
+    new_platform_url: settings.new_platform_url || 'https://bs-academy7.github.io/BS-Academy/',
+    expiration_timestamp: settings.expiration_timestamp || new Date(Date.now() + 30 * 86400000).toISOString(),
+    new_qr_media_url: settings.new_qr_media_url || null,
+    support_contact_url: settings.support_contact_url || 'https://wa.me/201550755928',
+    updated_by: user?.id || null
+  };
+
+  const { data, error } = await supabaseClient
+    .from('qr_routing_settings')
+    .upsert(payload, { onConflict: 'id' })
+    .select()
+    .single();
+
+  return { data, error };
+}
+
+async function bsUploadQrMedia(file) {
+  if (!file) return { error: { message: 'Missing QR file' } };
+  if (typeof bsUploadToGoogleDrive === 'function' && isGoogleDriveUploadConfigured) {
+    return bsUploadToGoogleDrive(file, '08_QR_Lifecycle/New_QR', {
+      entityType: 'qr_lifecycle',
+      category: 'new_qr_media',
+      visibilityScope: 'public_router'
+    });
+  }
+
+  return bsUploadImage(file, 'qr-lifecycle', {
+    entityType: 'qr_lifecycle',
+    category: 'new_qr_media'
+  });
+}
+
+/* ============================================
    ON-DEMAND REQUESTS (mirrors Google Sheet)
    ============================================ */
 

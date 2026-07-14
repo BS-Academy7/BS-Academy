@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   let documentSettings = null;
   let managedProfiles = [];
   let documentTemplates = [];
+  let qrRoutingSettings = null;
 
   // Check initial auth state
   await checkAuth();
@@ -73,6 +74,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (contactsNav) contactsNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
     const documentsNav = document.querySelector('.nav-item[data-tab="documents"]');
     if (documentsNav) documentsNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
+    const qrNav = document.querySelector('.nav-item[data-tab="qr-lifecycle"]');
+    if (qrNav) qrNav.style.display = ['admin', 'super_admin'].includes(role) ? 'flex' : 'none';
     const usersNav = document.querySelector('.nav-item[data-tab="users"]');
     if (usersNav) usersNav.style.display = role === 'super_admin' ? 'flex' : 'none';
   }
@@ -119,6 +122,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     documentTemplates = typeof bsGetDocumentTemplates === 'function'
       ? await bsGetDocumentTemplates()
       : [];
+    qrRoutingSettings = typeof bsGetQrRoutingSettings === 'function'
+      ? await bsGetQrRoutingSettings()
+      : null;
     
     // Fetch all academy_files
     const { data: filesData } = await supabaseClient.from('academy_files').select('*');
@@ -130,6 +136,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderDocumentSettings(documentSettings);
     renderManagedProfiles(managedProfiles);
     renderDocumentTemplates(documentTemplates);
+    renderQrRoutingSettings(qrRoutingSettings);
   }
 
   /* ==========================================
@@ -801,6 +808,124 @@ document.addEventListener('DOMContentLoaded', async () => {
         <td><span class="status-badge ${template.is_active ? 'approved' : 'rejected'}">${template.is_active ? 'نشط' : 'معطل'}</span></td>
       `;
       tbody.appendChild(tr);
+    });
+  }
+
+  /* ==========================================
+     QR Lifecycle
+     ========================================== */
+  const qrSettingsForm = document.getElementById('qrSettingsForm');
+  const qrPreviewBtn = document.getElementById('qrPreviewBtn');
+  const qrMediaFile = document.getElementById('qrMediaFile');
+  const qrMediaUrlInput = document.getElementById('qrNewQrMediaUrl');
+
+  function renderQrRoutingSettings(settings) {
+    if (!qrSettingsForm) return;
+    const fallback = {
+      transition_mode: false,
+      current_platform_url: 'https://bs-academy7.github.io/BS-Academy/',
+      new_platform_url: 'https://bs-academy7.github.io/BS-Academy/',
+      expiration_timestamp: new Date(Date.now() + 30 * 86400000).toISOString(),
+      new_qr_media_url: '',
+      support_contact_url: 'https://wa.me/201550755928'
+    };
+    const data = { ...fallback, ...(settings || {}) };
+
+    document.getElementById('qrTransitionMode').checked = Boolean(data.transition_mode);
+    document.getElementById('qrCurrentPlatformUrl').value = data.current_platform_url || fallback.current_platform_url;
+    document.getElementById('qrNewPlatformUrl').value = data.new_platform_url || fallback.new_platform_url;
+    document.getElementById('qrExpirationTimestamp').value = toDatetimeLocalValue(data.expiration_timestamp);
+    document.getElementById('qrSupportContactUrl').value = data.support_contact_url || fallback.support_contact_url;
+    document.getElementById('qrNewQrMediaUrl').value = data.new_qr_media_url || '';
+    renderQrAdminPreview(data.new_qr_media_url);
+  }
+
+  function collectQrRoutingSettings() {
+    return {
+      transition_mode: document.getElementById('qrTransitionMode')?.checked || false,
+      current_platform_url: document.getElementById('qrCurrentPlatformUrl')?.value.trim() || 'https://bs-academy7.github.io/BS-Academy/',
+      new_platform_url: document.getElementById('qrNewPlatformUrl')?.value.trim() || 'https://bs-academy7.github.io/BS-Academy/',
+      expiration_timestamp: fromDatetimeLocalValue(document.getElementById('qrExpirationTimestamp')?.value),
+      new_qr_media_url: document.getElementById('qrNewQrMediaUrl')?.value.trim() || null,
+      support_contact_url: document.getElementById('qrSupportContactUrl')?.value.trim() || 'https://wa.me/201550755928'
+    };
+  }
+
+  function renderQrAdminPreview(url) {
+    const preview = document.getElementById('qrAdminPreview');
+    if (!preview) return;
+    if (url) {
+      preview.src = url;
+      preview.hidden = false;
+    } else {
+      preview.removeAttribute('src');
+      preview.hidden = true;
+    }
+  }
+
+  function toDatetimeLocalValue(value) {
+    const date = value ? new Date(value) : new Date(Date.now() + 30 * 86400000);
+    if (!Number.isFinite(date.getTime())) return '';
+    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+  }
+
+  function fromDatetimeLocalValue(value) {
+    if (!value) return new Date(Date.now() + 30 * 86400000).toISOString();
+    const date = new Date(value);
+    return Number.isFinite(date.getTime()) ? date.toISOString() : new Date(Date.now() + 30 * 86400000).toISOString();
+  }
+
+  function setQrStatus(message, type = 'info') {
+    const status = document.getElementById('qrSettingsStatus');
+    if (!status) return;
+    status.textContent = message || '';
+    status.dataset.type = type;
+  }
+
+  if (qrMediaUrlInput) {
+    qrMediaUrlInput.addEventListener('input', () => renderQrAdminPreview(qrMediaUrlInput.value.trim()));
+  }
+
+  if (qrSettingsForm) {
+    qrSettingsForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = qrSettingsForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      setQrStatus('جاري حفظ إعدادات QR...');
+
+      const payload = collectQrRoutingSettings();
+      const file = qrMediaFile?.files?.[0];
+      if (file && typeof bsUploadQrMedia === 'function') {
+        const uploadResult = await bsUploadQrMedia(file);
+        if (uploadResult?.error) {
+          submitBtn.disabled = false;
+          setQrStatus('فشل رفع صورة QR: ' + uploadResult.error.message, 'error');
+          return;
+        }
+        payload.new_qr_media_url = uploadResult.url;
+        if (qrMediaUrlInput) qrMediaUrlInput.value = uploadResult.url;
+      }
+
+      const result = typeof bsSaveQrRoutingSettings === 'function'
+        ? await bsSaveQrRoutingSettings(payload)
+        : { error: { message: 'QR settings helper is missing' } };
+
+      submitBtn.disabled = false;
+      if (result?.error) {
+        setQrStatus('فشل حفظ إعدادات QR: ' + result.error.message, 'error');
+        return;
+      }
+
+      qrRoutingSettings = result.data;
+      renderQrRoutingSettings(qrRoutingSettings);
+      setQrStatus('تم حفظ إعدادات QR بنجاح. استخدم الرابط الثابت في أي QR Code.', 'success');
+    });
+  }
+
+  if (qrPreviewBtn) {
+    qrPreviewBtn.addEventListener('click', () => {
+      window.open('qr.html?preview=' + Date.now(), '_blank', 'noopener');
     });
   }
 
