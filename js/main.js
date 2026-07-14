@@ -206,14 +206,20 @@
     if (!href || href === '#') return '#';
 
     if (type === 'telegram') {
-      if (/^https?:\/\//i.test(href)) return href;
-      const username = href.replace(/^@/, '').replace(/^t\.me\//i, '').replace(/^telegram\.me\//i, '');
-      return `https://t.me/${encodeURIComponent(username)}`;
+      const username = href
+        .replace(/^https?:\/\/(www\.)?(t\.me|telegram\.me)\//i, '')
+        .replace(/^@/, '')
+        .replace(/^t\.me\//i, '')
+        .replace(/^telegram\.me\//i, '')
+        .split(/[?#]/)[0];
+      return `https://telegram.me/${encodeURIComponent(username)}`;
     }
 
     if (type === 'email') {
-      if (/^mailto:/i.test(href)) return href;
-      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(href)) return `mailto:${href}`;
+      const email = href.replace(/^mailto:/i, '').split('?')[0];
+      if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
+      }
       return href;
     }
 
