@@ -182,6 +182,16 @@
     custom: '<span class="contact-icon-text">link</span>'
   };
 
+  const contactPrefillMessage = [
+    'مرحبًا B&S Academy',
+    '',
+    'أرغب في التواصل مع فريق الأكاديمية.',
+    '',
+    'الاسم:',
+    'نوع الطلب:',
+    'التفاصيل:'
+  ].join('\n');
+
   function contactLabel(contact) {
     if (!contact) return '';
     if (typeof currentLang !== 'undefined' && currentLang === 'en') {
@@ -202,13 +212,19 @@
         .replace(/^t\.me\//i, '')
         .replace(/^telegram\.me\//i, '')
         .split(/[?#]/)[0];
-      return `https://telegram.me/${encodeURIComponent(username)}`;
+      return `https://telegram.me/${encodeURIComponent(username)}?text=${encodeURIComponent(contactPrefillMessage)}`;
     }
 
     if (type === 'email') {
-      const email = href.replace(/^mailto:/i, '').split('?')[0];
+      let email = href.replace(/^mailto:/i, '').split('?')[0];
+      try {
+        const parsed = new URL(href);
+        email = parsed.searchParams.get('to') || email;
+      } catch (error) {
+        // Keep the plain href parsing path for mailto and raw email values.
+      }
       if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
+        return `mailto:${email}`;
       }
       return href;
     }
@@ -235,7 +251,9 @@
         const type = String(contact.icon_key || contact.contact_type || 'custom').toLowerCase();
         const icon = contactIcons[type] || contactIcons.custom;
         const label = contactLabel(contact);
-        return `<a class="footer-contact-icon-link" href="${normalizeContactHref(contact)}" aria-label="${label}" title="${label}" target="_blank" rel="noopener">${icon}</a>`;
+        const href = normalizeContactHref(contact);
+        const targetAttrs = href.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"';
+        return `<a class="footer-contact-icon-link" href="${href}" aria-label="${label}" title="${label}"${targetAttrs}>${icon}</a>`;
       }).join('');
     }
 
@@ -244,7 +262,9 @@
         const type = String(contact.icon_key || contact.contact_type || 'custom').toLowerCase();
         const icon = contactIcons[type] || contactIcons.custom;
         const label = contactLabel(contact);
-        return `<a class="footer-contact-link footer-contact-icon-link" href="${normalizeContactHref(contact)}" aria-label="${label}" title="${label}" target="_blank" rel="noopener">${icon}</a>`;
+        const href = normalizeContactHref(contact);
+        const targetAttrs = href.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"';
+        return `<a class="footer-contact-link footer-contact-icon-link" href="${href}" aria-label="${label}" title="${label}"${targetAttrs}>${icon}</a>`;
       }).join('');
     }
   }
