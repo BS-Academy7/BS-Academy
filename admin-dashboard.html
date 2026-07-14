@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" href="images/logo.png" as="image">
+  <link rel="preload" href="images/logo.webp" as="image">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="css/admin-dashboard.css?v=20260711-viewer-v1" />
@@ -22,12 +22,12 @@
   <div id="adminLoginGate" class="admin-gate">
     <div class="admin-gate-card">
       <div class="academy-logo">
-        <img src="images/logo.png" alt="B&S Academy" class="admin-brand-logo">
+        <img src="images/logo.webp" alt="B&S Academy" class="admin-brand-logo">
         <span class="logo-text">B&S <span>Academy</span></span>
       </div>
-      <h2>بوابة الإدارة العليا</h2>
-      <p>سجّل دخولك من بوابة الحسابات الموحدة، وسيتم توجيه أصحاب الصلاحيات تلقائيا للوحة التحكم.</p>
-      <a class="btn btn-primary gate-auth-link" href="auth.html?next=admin-dashboard.html">الدخول من بوابة الحسابات</a>
+      <h2>Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø¹Ù„ÙŠØ§</h2>
+      <p>Ø³Ø¬Ù‘Ù„ Ø¯Ø®ÙˆÙ„Ùƒ Ù…Ù† Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª Ø§Ù„Ù…ÙˆØ­Ø¯Ø©ØŒ ÙˆØ³ÙŠØªÙ… ØªÙˆØ¬ÙŠÙ‡ Ø£ØµØ­Ø§Ø¨ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª ØªÙ„Ù‚Ø§Ø¦ÙŠØ§ Ù„Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ….</p>
+      <a class="btn btn-primary gate-auth-link" href="auth.html?next=admin-dashboard.html">Ø§Ù„Ø¯Ø®ÙˆÙ„ Ù…Ù† Ø¨ÙˆØ§Ø¨Ø© Ø§Ù„Ø­Ø³Ø§Ø¨Ø§Øª</a>
       <p id="adminLoginError" class="error-message"></p>
     </div>
   </div>
@@ -37,33 +37,33 @@
     <!-- Sidebar -->
     <aside class="admin-sidebar">
       <div class="sidebar-header">
-        <img src="images/logo.png" alt="B&S Academy" class="admin-sidebar-logo">
+        <img src="images/logo.webp" alt="B&S Academy" class="admin-sidebar-logo">
         <span class="logo-text">B&S <span>Dashboard</span></span>
       </div>
       <nav class="sidebar-nav">
         <a href="#requests" class="nav-item active" data-tab="requests">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-          طلبات On-Demand
+          Ø·Ù„Ø¨Ø§Øª On-Demand
         </a>
         <a href="#onboarding" class="nav-item" data-tab="onboarding">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="m16 11 2 2 4-4"></path></svg>
-          التسجيلات والمراحل
+          Ø§Ù„ØªØ³Ø¬ÙŠÙ„Ø§Øª ÙˆØ§Ù„Ù…Ø±Ø§Ø­Ù„
         </a>
         <a href="#users" class="nav-item" data-tab="users">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-          المستخدمون والصلاحيات
+          Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ† ÙˆØ§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª
         </a>
         <a href="#files" class="nav-item" data-tab="files">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-          إدارة الملفات
+          Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ù„ÙØ§Øª
         </a>
         <a href="#contacts" class="nav-item" data-tab="contacts">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.11 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.91.33 1.8.62 2.65a2 2 0 0 1-.45 2.11L8 9.75a16 16 0 0 0 6.25 6.25l1.27-1.27a2 2 0 0 1 2.11-.45c.85.29 1.74.5 2.65.62A2 2 0 0 1 22 16.92z"></path></svg>
-          وسائل التواصل
+          ÙˆØ³Ø§Ø¦Ù„ Ø§Ù„ØªÙˆØ§ØµÙ„
         </a>
         <a href="#documents" class="nav-item" data-tab="documents">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"></path><path d="M8 8h8"></path><path d="M8 12h8"></path><path d="M8 16h5"></path></svg>
-          الفواتير والمستندات
+          Ø§Ù„ÙÙˆØ§ØªÙŠØ± ÙˆØ§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª
         </a>
         <a href="#qr-lifecycle" class="nav-item" data-tab="qr-lifecycle">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3"></path><path d="M21 14v7h-7"></path></svg>
@@ -71,8 +71,8 @@
         </a>
       </nav>
       <div class="sidebar-footer">
-        <div class="user-info" id="adminUserInfo">جاري التحميل...</div>
-        <button id="adminLogoutBtn" class="btn btn-outline" style="width: 100%; margin-top: 10px;">تسجيل خروج</button>
+        <div class="user-info" id="adminUserInfo">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</div>
+        <button id="adminLogoutBtn" class="btn btn-outline" style="width: 100%; margin-top: 10px;">ØªØ³Ø¬ÙŠÙ„ Ø®Ø±ÙˆØ¬</button>
       </div>
     </aside>
 
@@ -81,7 +81,7 @@
       
       <!-- Topbar -->
       <header class="admin-topbar">
-        <h1 id="pageTitle">طلبات On-Demand</h1>
+        <h1 id="pageTitle">Ø·Ù„Ø¨Ø§Øª On-Demand</h1>
       </header>
 
       <!-- Views -->
@@ -94,16 +94,16 @@
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>تاريخ الطلب</th>
-                    <th>الطالب</th>
-                    <th>المادة / الموضوع</th>
-                    <th>المرحلة</th>
-                    <th>المرفقات</th>
-                    <th>الحالة</th>
+                    <th>ØªØ§Ø±ÙŠØ® Ø§Ù„Ø·Ù„Ø¨</th>
+                    <th>Ø§Ù„Ø·Ø§Ù„Ø¨</th>
+                    <th>Ø§Ù„Ù…Ø§Ø¯Ø© / Ø§Ù„Ù…ÙˆØ¶ÙˆØ¹</th>
+                    <th>Ø§Ù„Ù…Ø±Ø­Ù„Ø©</th>
+                    <th>Ø§Ù„Ù…Ø±ÙÙ‚Ø§Øª</th>
+                    <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
                   </tr>
                 </thead>
                 <tbody id="requestsTableBody">
-                  <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
+                  <tr><td colspan="6" class="loading-cell">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -115,25 +115,25 @@
           <div class="card">
             <div class="section-head">
               <div>
-                <h2>طلبات التسجيل الجديدة</h2>
-                <p>قبول مباشر، نقل مرحلة، أو متابعة استكمال البيانات حسب نوع الحساب.</p>
+                <h2>Ø·Ù„Ø¨Ø§Øª Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¬Ø¯ÙŠØ¯Ø©</h2>
+                <p>Ù‚Ø¨ÙˆÙ„ Ù…Ø¨Ø§Ø´Ø±ØŒ Ù†Ù‚Ù„ Ù…Ø±Ø­Ù„Ø©ØŒ Ø£Ùˆ Ù…ØªØ§Ø¨Ø¹Ø© Ø§Ø³ØªÙƒÙ…Ø§Ù„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø­Ø³Ø¨ Ù†ÙˆØ¹ Ø§Ù„Ø­Ø³Ø§Ø¨.</p>
               </div>
             </div>
             <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>تاريخ التسجيل</th>
-                    <th>المستخدم</th>
-                    <th>نوع الحساب</th>
-                    <th>التخصص / البوزيشن</th>
-                    <th>المرحلة الحالية</th>
-                    <th>الحالة</th>
-                    <th>إجراء</th>
+                    <th>ØªØ§Ø±ÙŠØ® Ø§Ù„ØªØ³Ø¬ÙŠÙ„</th>
+                    <th>Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…</th>
+                    <th>Ù†ÙˆØ¹ Ø§Ù„Ø­Ø³Ø§Ø¨</th>
+                    <th>Ø§Ù„ØªØ®ØµØµ / Ø§Ù„Ø¨ÙˆØ²ÙŠØ´Ù†</th>
+                    <th>Ø§Ù„Ù…Ø±Ø­Ù„Ø© Ø§Ù„Ø­Ø§Ù„ÙŠØ©</th>
+                    <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                    <th>Ø¥Ø¬Ø±Ø§Ø¡</th>
                   </tr>
                 </thead>
                 <tbody id="onboardingTableBody">
-                  <tr><td colspan="7" class="loading-cell">جاري التحميل...</td></tr>
+                  <tr><td colspan="7" class="loading-cell">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -145,27 +145,27 @@
           <div class="card">
             <div class="section-head">
               <div>
-                <h2>المستخدمون والصلاحيات</h2>
-                <p>كل حساب يسجل في الأكاديمية يظهر هنا، مع إمكانية تعديل الدور أو تعطيل الحساب من الداشبورد.</p>
+                <h2>Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…ÙˆÙ† ÙˆØ§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª</h2>
+                <p>ÙƒÙ„ Ø­Ø³Ø§Ø¨ ÙŠØ³Ø¬Ù„ ÙÙŠ Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ© ÙŠØ¸Ù‡Ø± Ù‡Ù†Ø§ØŒ Ù…Ø¹ Ø¥Ù…ÙƒØ§Ù†ÙŠØ© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„Ø¯ÙˆØ± Ø£Ùˆ ØªØ¹Ø·ÙŠÙ„ Ø§Ù„Ø­Ø³Ø§Ø¨ Ù…Ù† Ø§Ù„Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯.</p>
               </div>
             </div>
 
             <div class="admin-warning-box">
-              <strong>مهم:</strong>
-              إنشاء مستخدم بالباسورد أو حذف مستخدم من Supabase Auth نهائيا يحتاج Edge Function بمفتاح service_role. هنا نسجل الطلب ونعدل الصلاحيات الآمنة فقط من الداشبورد.
+              <strong>Ù…Ù‡Ù…:</strong>
+              Ø¥Ù†Ø´Ø§Ø¡ Ù…Ø³ØªØ®Ø¯Ù… Ø¨Ø§Ù„Ø¨Ø§Ø³ÙˆØ±Ø¯ Ø£Ùˆ Ø­Ø°Ù Ù…Ø³ØªØ®Ø¯Ù… Ù…Ù† Supabase Auth Ù†Ù‡Ø§Ø¦ÙŠØ§ ÙŠØ­ØªØ§Ø¬ Edge Function Ø¨Ù…ÙØªØ§Ø­ service_role. Ù‡Ù†Ø§ Ù†Ø³Ø¬Ù„ Ø§Ù„Ø·Ù„Ø¨ ÙˆÙ†Ø¹Ø¯Ù„ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ§Øª Ø§Ù„Ø¢Ù…Ù†Ø© ÙÙ‚Ø· Ù…Ù† Ø§Ù„Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯.
             </div>
 
             <form id="adminUserActionForm" class="management-form">
               <label>
-                إيميل المستخدم
+                Ø¥ÙŠÙ…ÙŠÙ„ Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù…
                 <input type="email" id="managedUserEmail" placeholder="user@example.com" required>
               </label>
               <label>
-                كلمة المرور المقترحة
-                <input type="text" id="managedUserPassword" placeholder="تستخدم لاحقا داخل Edge Function الآمنة">
+                ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± Ø§Ù„Ù…Ù‚ØªØ±Ø­Ø©
+                <input type="text" id="managedUserPassword" placeholder="ØªØ³ØªØ®Ø¯Ù… Ù„Ø§Ø­Ù‚Ø§ Ø¯Ø§Ø®Ù„ Edge Function Ø§Ù„Ø¢Ù…Ù†Ø©">
               </label>
               <label>
-                الدور المطلوب
+                Ø§Ù„Ø¯ÙˆØ± Ø§Ù„Ù…Ø·Ù„ÙˆØ¨
                 <select id="managedUserRole">
                   <option value="student">Student</option>
                   <option value="instructor">Instructor</option>
@@ -175,15 +175,15 @@
                 </select>
               </label>
               <label>
-                نوع الحساب
+                Ù†ÙˆØ¹ Ø§Ù„Ø­Ø³Ø§Ø¨
                 <select id="managedUserAccountType">
-                  <option value="student">طالب</option>
-                  <option value="instructor">محاضر</option>
-                  <option value="staff">فريق / إدارة</option>
+                  <option value="student">Ø·Ø§Ù„Ø¨</option>
+                  <option value="instructor">Ù…Ø­Ø§Ø¶Ø±</option>
+                  <option value="staff">ÙØ±ÙŠÙ‚ / Ø¥Ø¯Ø§Ø±Ø©</option>
                 </select>
               </label>
               <div class="contact-form-actions">
-                <button type="submit" class="btn btn-primary">تسجيل طلب إنشاء مستخدم</button>
+                <button type="submit" class="btn btn-primary">ØªØ³Ø¬ÙŠÙ„ Ø·Ù„Ø¨ Ø¥Ù†Ø´Ø§Ø¡ Ù…Ø³ØªØ®Ø¯Ù…</button>
               </div>
             </form>
 
@@ -191,16 +191,16 @@
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>الاسم</th>
-                    <th>الدور</th>
-                    <th>نوع الحساب</th>
-                    <th>حالة الحساب</th>
-                    <th>الحالة الداخلية</th>
-                    <th>إجراء</th>
+                    <th>Ø§Ù„Ø§Ø³Ù…</th>
+                    <th>Ø§Ù„Ø¯ÙˆØ±</th>
+                    <th>Ù†ÙˆØ¹ Ø§Ù„Ø­Ø³Ø§Ø¨</th>
+                    <th>Ø­Ø§Ù„Ø© Ø§Ù„Ø­Ø³Ø§Ø¨</th>
+                    <th>Ø§Ù„Ø­Ø§Ù„Ø© Ø§Ù„Ø¯Ø§Ø®Ù„ÙŠØ©</th>
+                    <th>Ø¥Ø¬Ø±Ø§Ø¡</th>
                   </tr>
                 </thead>
                 <tbody id="managedUsersTableBody">
-                  <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
+                  <tr><td colspan="6" class="loading-cell">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -212,15 +212,15 @@
           <div class="card">
             <div class="section-head">
               <div>
-                <h2>وسائل التواصل</h2>
-                <p>إدارة أيقونات وروابط التواصل التي تظهر في فوتر الأكاديمية.</p>
+                <h2>ÙˆØ³Ø§Ø¦Ù„ Ø§Ù„ØªÙˆØ§ØµÙ„</h2>
+                <p>Ø¥Ø¯Ø§Ø±Ø© Ø£ÙŠÙ‚ÙˆÙ†Ø§Øª ÙˆØ±ÙˆØ§Ø¨Ø· Ø§Ù„ØªÙˆØ§ØµÙ„ Ø§Ù„ØªÙŠ ØªØ¸Ù‡Ø± ÙÙŠ ÙÙˆØªØ± Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ©.</p>
               </div>
             </div>
 
             <form id="contactForm" class="contact-admin-form">
               <input type="hidden" id="contactId">
               <label>
-                النوع
+                Ø§Ù„Ù†ÙˆØ¹
                 <select id="contactType" required>
                   <option value="whatsapp">WhatsApp</option>
                   <option value="telegram">Telegram</option>
@@ -232,24 +232,24 @@
                 </select>
               </label>
               <label>
-                الاسم الظاهر
-                <input type="text" id="contactLabel" required placeholder="مثال: WhatsApp">
+                Ø§Ù„Ø§Ø³Ù… Ø§Ù„Ø¸Ø§Ù‡Ø±
+                <input type="text" id="contactLabel" required placeholder="Ù…Ø«Ø§Ù„: WhatsApp">
               </label>
               <label>
-                الرابط / القيمة
-                <input type="text" id="contactHref" required placeholder="https://t.me/... أو https://wa.me/...">
+                Ø§Ù„Ø±Ø§Ø¨Ø· / Ø§Ù„Ù‚ÙŠÙ…Ø©
+                <input type="text" id="contactHref" required placeholder="https://t.me/... Ø£Ùˆ https://wa.me/...">
               </label>
               <label>
-                الترتيب
+                Ø§Ù„ØªØ±ØªÙŠØ¨
                 <input type="number" id="contactSortOrder" value="1" min="1">
               </label>
               <label class="contact-active-row">
                 <input type="checkbox" id="contactIsActive" checked>
-                ظاهر في الموقع
+                Ø¸Ø§Ù‡Ø± ÙÙŠ Ø§Ù„Ù…ÙˆÙ‚Ø¹
               </label>
               <div class="contact-form-actions">
-                <button type="submit" class="btn btn-primary">حفظ وسيلة التواصل</button>
-                <button type="button" id="contactResetBtn" class="btn btn-outline">إلغاء التعديل</button>
+                <button type="submit" class="btn btn-primary">Ø­ÙØ¸ ÙˆØ³ÙŠÙ„Ø© Ø§Ù„ØªÙˆØ§ØµÙ„</button>
+                <button type="button" id="contactResetBtn" class="btn btn-outline">Ø¥Ù„ØºØ§Ø¡ Ø§Ù„ØªØ¹Ø¯ÙŠÙ„</button>
               </div>
             </form>
 
@@ -257,16 +257,16 @@
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>النوع</th>
-                    <th>الاسم</th>
-                    <th>الرابط</th>
-                    <th>الترتيب</th>
-                    <th>الحالة</th>
-                    <th>إجراء</th>
+                    <th>Ø§Ù„Ù†ÙˆØ¹</th>
+                    <th>Ø§Ù„Ø§Ø³Ù…</th>
+                    <th>Ø§Ù„Ø±Ø§Ø¨Ø·</th>
+                    <th>Ø§Ù„ØªØ±ØªÙŠØ¨</th>
+                    <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
+                    <th>Ø¥Ø¬Ø±Ø§Ø¡</th>
                   </tr>
                 </thead>
                 <tbody id="contactsTableBody">
-                  <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
+                  <tr><td colspan="6" class="loading-cell">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -278,68 +278,68 @@
           <div class="card">
             <div class="section-head">
               <div>
-                <h2>إعدادات الفواتير والمستندات</h2>
-                <p>اختيار اللغة والعملة الافتراضية، وتجهيز التمبلت الرسمي للفواتير والعقود والشهادات.</p>
+                <h2>Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„ÙÙˆØ§ØªÙŠØ± ÙˆØ§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª</h2>
+                <p>Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ù„ØºØ© ÙˆØ§Ù„Ø¹Ù…Ù„Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ©ØŒ ÙˆØªØ¬Ù‡ÙŠØ² Ø§Ù„ØªÙ…Ø¨Ù„Øª Ø§Ù„Ø±Ø³Ù…ÙŠ Ù„Ù„ÙÙˆØ§ØªÙŠØ± ÙˆØ§Ù„Ø¹Ù‚ÙˆØ¯ ÙˆØ§Ù„Ø´Ù‡Ø§Ø¯Ø§Øª.</p>
               </div>
             </div>
 
             <form id="documentSettingsForm" class="document-settings-form">
               <label>
-                اللغة الافتراضية للمستند
+                Ø§Ù„Ù„ØºØ© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ© Ù„Ù„Ù…Ø³ØªÙ†Ø¯
                 <select id="docDefaultLanguage" data-document-language-select data-selected="ar"></select>
               </label>
               <label>
-                العملة الافتراضية
+                Ø§Ù„Ø¹Ù…Ù„Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠØ©
                 <select id="docDefaultCurrency" data-currency-select data-selected="EGP"></select>
               </label>
               <label class="contact-active-row">
                 <input type="checkbox" id="docAllowDualLanguage" checked>
-                السماح بإصدار الفاتورة بلغتين في نفس المستند
+                Ø§Ù„Ø³Ù…Ø§Ø­ Ø¨Ø¥ØµØ¯Ø§Ø± Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø¨Ù„ØºØªÙŠÙ† ÙÙŠ Ù†ÙØ³ Ø§Ù„Ù…Ø³ØªÙ†Ø¯
               </label>
               <label class="contact-active-row">
                 <input type="checkbox" id="docShowQr">
-                إظهار QR Code في الفاتورة عند الحاجة
+                Ø¥Ø¸Ù‡Ø§Ø± QR Code ÙÙŠ Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø¹Ù†Ø¯ Ø§Ù„Ø­Ø§Ø¬Ø©
               </label>
               <label>
-                مكان QR Code
+                Ù…ÙƒØ§Ù† QR Code
                 <select id="docQrPosition">
-                  <option value="footer">آخر الفاتورة</option>
-                  <option value="header">أعلى الفاتورة</option>
-                  <option value="hidden">مخفي</option>
+                  <option value="footer">Ø¢Ø®Ø± Ø§Ù„ÙØ§ØªÙˆØ±Ø©</option>
+                  <option value="header">Ø£Ø¹Ù„Ù‰ Ø§Ù„ÙØ§ØªÙˆØ±Ø©</option>
+                  <option value="hidden">Ù…Ø®ÙÙŠ</option>
                 </select>
               </label>
               <label class="document-wide">
-                بيانات البنك / المحافظ
+                Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¨Ù†Ùƒ / Ø§Ù„Ù…Ø­Ø§ÙØ¸
                 <textarea id="docBankDetails" rows="4" placeholder="Bank name, account name, IBAN, wallets..."></textarea>
               </label>
               <label class="document-wide">
-                شروط الفاتورة بالعربي
-                <textarea id="docInvoiceTermsAr" rows="4" placeholder="الشروط التي تظهر في آخر الفاتورة"></textarea>
+                Ø´Ø±ÙˆØ· Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø¨Ø§Ù„Ø¹Ø±Ø¨ÙŠ
+                <textarea id="docInvoiceTermsAr" rows="4" placeholder="Ø§Ù„Ø´Ø±ÙˆØ· Ø§Ù„ØªÙŠ ØªØ¸Ù‡Ø± ÙÙŠ Ø¢Ø®Ø± Ø§Ù„ÙØ§ØªÙˆØ±Ø©"></textarea>
               </label>
               <label class="document-wide">
                 Invoice terms in English
                 <textarea id="docInvoiceTermsEn" rows="4" placeholder="Invoice terms shown in English"></textarea>
               </label>
               <label class="document-wide">
-                رفع تمبلت فاتورة/عقد Word أو PDF
+                Ø±ÙØ¹ ØªÙ…Ø¨Ù„Øª ÙØ§ØªÙˆØ±Ø©/Ø¹Ù‚Ø¯ Word Ø£Ùˆ PDF
                 <input type="file" id="docTemplateFile" accept=".doc,.docx,.pdf,image/*">
               </label>
               <label class="document-wide">
-                اسم الاعتماد الرسمي
+                Ø§Ø³Ù… Ø§Ù„Ø§Ø¹ØªÙ…Ø§Ø¯ Ø§Ù„Ø±Ø³Ù…ÙŠ
                 <input type="text" id="docOwnerName" value="Eng/Bahaa Hussein">
               </label>
               <label class="contact-active-row">
                 <input type="checkbox" id="docShowOwnerFooter" checked>
-                إضافة الاسم والختم والتوقيع الرسمي تلقائيا في آخر المستند
+                Ø¥Ø¶Ø§ÙØ© Ø§Ù„Ø§Ø³Ù… ÙˆØ§Ù„Ø®ØªÙ… ÙˆØ§Ù„ØªÙˆÙ‚ÙŠØ¹ Ø§Ù„Ø±Ø³Ù…ÙŠ ØªÙ„Ù‚Ø§Ø¦ÙŠØ§ ÙÙŠ Ø¢Ø®Ø± Ø§Ù„Ù…Ø³ØªÙ†Ø¯
               </label>
               <div class="document-preview-card">
-                <strong>قاعدة الإخراج:</strong>
-                <span>كل فاتورة/عقد/شهادة يخرج حسب لغة الطالب أو اختيار الإدارة، وبالعملة المختارة، مع إمكانية تعديل التمبلت مستقبلا من الداشبورد.</span>
+                <strong>Ù‚Ø§Ø¹Ø¯Ø© Ø§Ù„Ø¥Ø®Ø±Ø§Ø¬:</strong>
+                <span>ÙƒÙ„ ÙØ§ØªÙˆØ±Ø©/Ø¹Ù‚Ø¯/Ø´Ù‡Ø§Ø¯Ø© ÙŠØ®Ø±Ø¬ Ø­Ø³Ø¨ Ù„ØºØ© Ø§Ù„Ø·Ø§Ù„Ø¨ Ø£Ùˆ Ø§Ø®ØªÙŠØ§Ø± Ø§Ù„Ø¥Ø¯Ø§Ø±Ø©ØŒ ÙˆØ¨Ø§Ù„Ø¹Ù…Ù„Ø© Ø§Ù„Ù…Ø®ØªØ§Ø±Ø©ØŒ Ù…Ø¹ Ø¥Ù…ÙƒØ§Ù†ÙŠØ© ØªØ¹Ø¯ÙŠÙ„ Ø§Ù„ØªÙ…Ø¨Ù„Øª Ù…Ø³ØªÙ‚Ø¨Ù„Ø§ Ù…Ù† Ø§Ù„Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯.</span>
               </div>
               <div class="contact-form-actions">
-                <button type="submit" class="btn btn-primary">حفظ إعدادات المستندات</button>
-                <button type="button" id="documentPreviewBtn" class="btn btn-outline">معاينة التمبلت</button>
-                <button type="button" id="documentSettingsResetBtn" class="btn btn-outline">استعادة الافتراضي</button>
+                <button type="submit" class="btn btn-primary">Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ù…Ø³ØªÙ†Ø¯Ø§Øª</button>
+                <button type="button" id="documentPreviewBtn" class="btn btn-outline">Ù…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„ØªÙ…Ø¨Ù„Øª</button>
+                <button type="button" id="documentSettingsResetBtn" class="btn btn-outline">Ø§Ø³ØªØ¹Ø§Ø¯Ø© Ø§Ù„Ø§ÙØªØ±Ø§Ø¶ÙŠ</button>
               </div>
             </form>
           </div>
@@ -347,27 +347,27 @@
           <div class="card">
             <div class="section-head">
               <div>
-                <h2>تمبلتات الفواتير والعقود</h2>
-                <p>قائمة التمبلتات المحفوظة، وبعد الربط الكامل يتم توليد PDF/عقد من هنا بالختم والتوقيع.</p>
+                <h2>ØªÙ…Ø¨Ù„ØªØ§Øª Ø§Ù„ÙÙˆØ§ØªÙŠØ± ÙˆØ§Ù„Ø¹Ù‚ÙˆØ¯</h2>
+                <p>Ù‚Ø§Ø¦Ù…Ø© Ø§Ù„ØªÙ…Ø¨Ù„ØªØ§Øª Ø§Ù„Ù…Ø­ÙÙˆØ¸Ø©ØŒ ÙˆØ¨Ø¹Ø¯ Ø§Ù„Ø±Ø¨Ø· Ø§Ù„ÙƒØ§Ù…Ù„ ÙŠØªÙ… ØªÙˆÙ„ÙŠØ¯ PDF/Ø¹Ù‚Ø¯ Ù…Ù† Ù‡Ù†Ø§ Ø¨Ø§Ù„Ø®ØªÙ… ÙˆØ§Ù„ØªÙˆÙ‚ÙŠØ¹.</p>
               </div>
             </div>
             <div id="documentTemplatePreview" class="document-live-preview">
-              اختر “معاينة التمبلت” لعرض شكل البيانات التي ستخرج في الفاتورة أو العقد.
+              Ø§Ø®ØªØ± â€œÙ…Ø¹Ø§ÙŠÙ†Ø© Ø§Ù„ØªÙ…Ø¨Ù„Øªâ€ Ù„Ø¹Ø±Ø¶ Ø´ÙƒÙ„ Ø§Ù„Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„ØªÙŠ Ø³ØªØ®Ø±Ø¬ ÙÙŠ Ø§Ù„ÙØ§ØªÙˆØ±Ø© Ø£Ùˆ Ø§Ù„Ø¹Ù‚Ø¯.
             </div>
             <div class="table-responsive">
               <table class="admin-table">
                 <thead>
                   <tr>
-                    <th>النوع</th>
-                    <th>الاسم</th>
-                    <th>اللغة</th>
-                    <th>العملة</th>
-                    <th>افتراضي</th>
-                    <th>الحالة</th>
+                    <th>Ø§Ù„Ù†ÙˆØ¹</th>
+                    <th>Ø§Ù„Ø§Ø³Ù…</th>
+                    <th>Ø§Ù„Ù„ØºØ©</th>
+                    <th>Ø§Ù„Ø¹Ù…Ù„Ø©</th>
+                    <th>Ø§ÙØªØ±Ø§Ø¶ÙŠ</th>
+                    <th>Ø§Ù„Ø­Ø§Ù„Ø©</th>
                   </tr>
                 </thead>
                 <tbody id="documentTemplatesTableBody">
-                  <tr><td colspan="6" class="loading-cell">جاري التحميل...</td></tr>
+                  <tr><td colspan="6" class="loading-cell">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -379,55 +379,55 @@
           <div class="card">
             <div class="section-head">
               <div>
-                <h2>إدارة دورة حياة QR Code</h2>
-                <p>التحكم في رابط الـ QR القديم: توجيه مباشر، فترة انتقالية بعداد، أو إيقاف كامل وتحويل للدعم.</p>
+                <h2>Ø¥Ø¯Ø§Ø±Ø© Ø¯ÙˆØ±Ø© Ø­ÙŠØ§Ø© QR Code</h2>
+                <p>Ø§Ù„ØªØ­ÙƒÙ… ÙÙŠ Ø±Ø§Ø¨Ø· Ø§Ù„Ù€ QR Ø§Ù„Ù‚Ø¯ÙŠÙ…: ØªÙˆØ¬ÙŠÙ‡ Ù…Ø¨Ø§Ø´Ø±ØŒ ÙØªØ±Ø© Ø§Ù†ØªÙ‚Ø§Ù„ÙŠØ© Ø¨Ø¹Ø¯Ø§Ø¯ØŒ Ø£Ùˆ Ø¥ÙŠÙ‚Ø§Ù ÙƒØ§Ù…Ù„ ÙˆØªØ­ÙˆÙŠÙ„ Ù„Ù„Ø¯Ø¹Ù….</p>
               </div>
             </div>
 
             <div class="qr-admin-link-box">
-              <span>الرابط الثابت الذي يوضع داخل أي QR Code:</span>
+              <span>Ø§Ù„Ø±Ø§Ø¨Ø· Ø§Ù„Ø«Ø§Ø¨Øª Ø§Ù„Ø°ÙŠ ÙŠÙˆØ¶Ø¹ Ø¯Ø§Ø®Ù„ Ø£ÙŠ QR Code:</span>
               <input id="qrLandingLink" type="text" value="https://bs-academy7.github.io/BS-Academy/qr.html" readonly>
             </div>
 
             <form id="qrSettingsForm" class="document-settings-form qr-settings-form">
               <label class="contact-active-row document-wide">
                 <input type="checkbox" id="qrTransitionMode">
-                تشغيل وضع الانتقال إلى منصة/دومين جديد
+                ØªØ´ØºÙŠÙ„ ÙˆØ¶Ø¹ Ø§Ù„Ø§Ù†ØªÙ‚Ø§Ù„ Ø¥Ù„Ù‰ Ù…Ù†ØµØ©/Ø¯ÙˆÙ…ÙŠÙ† Ø¬Ø¯ÙŠØ¯
               </label>
               <label>
-                رابط المنصة الحالي
+                Ø±Ø§Ø¨Ø· Ø§Ù„Ù…Ù†ØµØ© Ø§Ù„Ø­Ø§Ù„ÙŠ
                 <input type="url" id="qrCurrentPlatformUrl" placeholder="https://bs-academy7.github.io/BS-Academy/">
               </label>
               <label>
-                رابط المنصة الجديد
+                Ø±Ø§Ø¨Ø· Ø§Ù„Ù…Ù†ØµØ© Ø§Ù„Ø¬Ø¯ÙŠØ¯
                 <input type="url" id="qrNewPlatformUrl" placeholder="https://your-new-domain.com/">
               </label>
               <label>
-                تاريخ ووقت انتهاء صلاحية QR القديم
+                ØªØ§Ø±ÙŠØ® ÙˆÙˆÙ‚Øª Ø§Ù†ØªÙ‡Ø§Ø¡ ØµÙ„Ø§Ø­ÙŠØ© QR Ø§Ù„Ù‚Ø¯ÙŠÙ…
                 <input type="datetime-local" id="qrExpirationTimestamp">
               </label>
               <label>
-                رابط الدعم الفني بعد انتهاء الصلاحية
+                Ø±Ø§Ø¨Ø· Ø§Ù„Ø¯Ø¹Ù… Ø§Ù„ÙÙ†ÙŠ Ø¨Ø¹Ø¯ Ø§Ù†ØªÙ‡Ø§Ø¡ Ø§Ù„ØµÙ„Ø§Ø­ÙŠØ©
                 <input type="url" id="qrSupportContactUrl" placeholder="https://wa.me/201550755928">
               </label>
               <label>
-                رابط صورة QR الجديد
+                Ø±Ø§Ø¨Ø· ØµÙˆØ±Ø© QR Ø§Ù„Ø¬Ø¯ÙŠØ¯
                 <input type="url" id="qrNewQrMediaUrl" placeholder="https://.../new-qr.png">
               </label>
               <label>
-                رفع صورة QR جديد
+                Ø±ÙØ¹ ØµÙˆØ±Ø© QR Ø¬Ø¯ÙŠØ¯
                 <input type="file" id="qrMediaFile" accept="image/*">
               </label>
               <div class="qr-preview-card document-wide">
                 <img id="qrAdminPreview" src="" alt="QR preview" hidden>
                 <div>
-                  <strong>طريقة العمل:</strong>
-                  <span>لو وضع الانتقال مغلق، الطالب يدخل مباشرة للرابط الحالي. لو مفتوح، تظهر شاشة تحديث حتى موعد الانتهاء. بعد الانتهاء يظهر زر الدعم فقط.</span>
+                  <strong>Ø·Ø±ÙŠÙ‚Ø© Ø§Ù„Ø¹Ù…Ù„:</strong>
+                  <span>Ù„Ùˆ ÙˆØ¶Ø¹ Ø§Ù„Ø§Ù†ØªÙ‚Ø§Ù„ Ù…ØºÙ„Ù‚ØŒ Ø§Ù„Ø·Ø§Ù„Ø¨ ÙŠØ¯Ø®Ù„ Ù…Ø¨Ø§Ø´Ø±Ø© Ù„Ù„Ø±Ø§Ø¨Ø· Ø§Ù„Ø­Ø§Ù„ÙŠ. Ù„Ùˆ Ù…ÙØªÙˆØ­ØŒ ØªØ¸Ù‡Ø± Ø´Ø§Ø´Ø© ØªØ­Ø¯ÙŠØ« Ø­ØªÙ‰ Ù…ÙˆØ¹Ø¯ Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡. Ø¨Ø¹Ø¯ Ø§Ù„Ø§Ù†ØªÙ‡Ø§Ø¡ ÙŠØ¸Ù‡Ø± Ø²Ø± Ø§Ù„Ø¯Ø¹Ù… ÙÙ‚Ø·.</span>
                 </div>
               </div>
               <div class="contact-form-actions">
-                <button type="submit" class="btn btn-primary">حفظ إعدادات QR</button>
-                <button type="button" id="qrPreviewBtn" class="btn btn-outline">فتح صفحة QR للتجربة</button>
+                <button type="submit" class="btn btn-primary">Ø­ÙØ¸ Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª QR</button>
+                <button type="button" id="qrPreviewBtn" class="btn btn-outline">ÙØªØ­ ØµÙØ­Ø© QR Ù„Ù„ØªØ¬Ø±Ø¨Ø©</button>
               </div>
               <p id="qrSettingsStatus" class="qr-settings-status document-wide"></p>
             </form>
@@ -439,16 +439,16 @@
           <div class="card file-manager-card">
             <div class="fm-toolbar">
               <div class="fm-breadcrumb" id="fmBreadcrumb">
-                <span class="fm-crumb active" data-path="">📁 B&S Academy Drive</span>
+                <span class="fm-crumb active" data-path="">ðŸ“ B&S Academy Drive</span>
               </div>
               <div class="fm-actions">
-                <button id="fmBtnCreateFolder" class="btn btn-outline">+ فولدر جديد</button>
-                <button id="fmBtnUpload" class="btn btn-primary">رفع ملف هنا</button>
+                <button id="fmBtnCreateFolder" class="btn btn-outline">+ ÙÙˆÙ„Ø¯Ø± Ø¬Ø¯ÙŠØ¯</button>
+                <button id="fmBtnUpload" class="btn btn-primary">Ø±ÙØ¹ Ù…Ù„Ù Ù‡Ù†Ø§</button>
               </div>
             </div>
             
             <div class="fm-content">
-              <div id="fmLoading" class="fm-loading" style="display: none;">جاري التحميل...</div>
+              <div id="fmLoading" class="fm-loading" style="display: none;">Ø¬Ø§Ø±ÙŠ Ø§Ù„ØªØ­Ù…ÙŠÙ„...</div>
               <div id="fmGrid" class="fm-grid">
                 <!-- Items will be injected here -->
               </div>
@@ -464,24 +464,24 @@
   <div id="fileViewerModal" class="modal">
     <div class="modal-content file-viewer">
       <div class="modal-header">
-        <h3 id="fvTitle">عرض الملف</h3>
+        <h3 id="fvTitle">Ø¹Ø±Ø¶ Ø§Ù„Ù…Ù„Ù</h3>
         <span class="close-modal">&times;</span>
       </div>
       <div class="modal-body">
         <div class="fv-metadata">
-          <p><strong>اسم الملف:</strong> <span id="fvName">...</span></p>
-          <p><strong>الحجم:</strong> <span id="fvSize">...</span></p>
-          <p><strong>النوع:</strong> <span id="fvType">...</span></p>
+          <p><strong>Ø§Ø³Ù… Ø§Ù„Ù…Ù„Ù:</strong> <span id="fvName">...</span></p>
+          <p><strong>Ø§Ù„Ø­Ø¬Ù…:</strong> <span id="fvSize">...</span></p>
+          <p><strong>Ø§Ù„Ù†ÙˆØ¹:</strong> <span id="fvType">...</span></p>
         </div>
         <div id="fvPreview" class="fv-preview">
-          <div class="fv-empty">اختر ملفا لعرضه داخل الأكاديمية.</div>
+          <div class="fv-empty">Ø§Ø®ØªØ± Ù…Ù„ÙØ§ Ù„Ø¹Ø±Ø¶Ù‡ Ø¯Ø§Ø®Ù„ Ø§Ù„Ø£ÙƒØ§Ø¯ÙŠÙ…ÙŠØ©.</div>
         </div>
         
         <div class="fv-actions">
           <!-- Download Button for All Admins -->
-          <a id="fvDownloadBtn" class="btn btn-primary" href="#" target="_blank">تحميل الملف</a>
+          <a id="fvDownloadBtn" class="btn btn-primary" href="#" target="_blank">ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ù…Ù„Ù</a>
           <!-- Drive Link (Only for Super Admins) -->
-          <a id="fvDriveBtn" class="btn btn-outline" href="#" target="_blank" style="display: none;">فتح في Google Drive</a>
+          <a id="fvDriveBtn" class="btn btn-outline" href="#" target="_blank" style="display: none;">ÙØªØ­ ÙÙŠ Google Drive</a>
         </div>
       </div>
     </div>
