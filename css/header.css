@@ -251,3 +251,13 @@
   .nav-actions { gap: var(--space-2); flex-shrink: 0; }
   .brand-mark-secondary { width: 28px; height: 28px; flex-shrink: 0; }
 }
+
+
+/* 20260717-final-logo-clean: keep brand images free of artificial shadows. */
+.brand-mark,
+.brand-mark-secondary,
+.about-seal {
+  filter: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}

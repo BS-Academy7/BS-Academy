@@ -150,3 +150,16 @@ select:focus-visible,
   height: 1px;
   background: var(--gold-signature);
 }
+
+/* 20260717-logo-clean: remove inherited shadows/backgrounds from brand assets. */
+.brand-mark,
+.brand-mark-secondary,
+.about-seal,
+.qr-logo,
+.auth-logo img,
+.admin-brand-logo,
+.admin-sidebar-logo {
+  filter: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
