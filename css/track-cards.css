@@ -854,3 +854,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+/* 20260717-hide-lock-policy: lock explanation is internal/admin-only, not shown to students. */
+.lock-policy-panel {
+  display: none !important;
+}

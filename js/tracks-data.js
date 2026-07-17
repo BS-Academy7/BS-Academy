@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    B&S Academy — Sector Tracks Data
    ============================================
    This is the SINGLE SOURCE OF TRUTH for every
@@ -789,54 +789,26 @@ function getSectorLockPolicy(sectorKey, lang) {
 function renderLockPolicyPanel(tree, lang, sectorKey, hasStudentSession) {
   const panel = document.getElementById('sectorLockPolicyPanel');
   if (!panel) return;
-
-  const policy = getSectorLockPolicy(sectorKey, lang);
-  const sequentialGroups = flattenProgramTree(tree).filter(item => item.node.children_sequential_lock === true).length;
-  const lockedCount = flattenProgramTree(tree).filter(item => getProgramStatus(item.node) === 'locked').length;
-  const copy = lang === 'ar'
-    ? {
-        label: hasStudentSession ? 'نشط على حسابك' : 'سيظهر فعليًا بعد تسجيل الدخول',
-        sequential: 'مجموعات متتابعة',
-        locked: 'مقفول الآن'
-      }
-    : {
-        label: hasStudentSession ? 'Active on your account' : 'Applies after login',
-        sequential: 'Sequential groups',
-        locked: 'Currently locked'
-      };
-
-  panel.innerHTML = `
-    <div class="lock-policy-copy">
-      <span>${copy.label}</span>
-      <h3>${escapeHtml(policy.title)}</h3>
-      <p>${escapeHtml(policy.desc)}</p>
-      <ul>
-        ${policy.rules.map(rule => `<li>${escapeHtml(rule)}</li>`).join('')}
-      </ul>
-    </div>
-    <div class="lock-policy-stats">
-      <div><strong>${sequentialGroups}</strong><span>${copy.sequential}</span></div>
-      <div><strong>${lockedCount}</strong><span>${copy.locked}</span></div>
-    </div>
-  `;
+  panel.innerHTML = '';
+  panel.hidden = true;
 }
 
 function getCourseToolsCopy(lang) {
   return lang === 'ar'
     ? {
-        title: 'أدوات الطالب',
-        search: 'ابحث باسم البرنامج أو المهارة...',
-        all: 'كل الحالات',
-        available: 'المتاح',
-        inProgress: 'قيد التعلم',
-        locked: 'المقفول',
-        completed: 'المكتمل',
-        expand: 'فتح كل التفاصيل',
-        collapse: 'طي التفاصيل',
-        hide: 'إخفاء الأدوات',
-        show: 'إظهار الأدوات',
-        empty: 'مفيش برامج مطابقة للبحث أو الفلتر الحالي.',
-        result: count => `${count} نتيجة ظاهرة`
+        title: '\u0623\u062f\u0648\u0627\u062a \u0627\u0644\u0637\u0627\u0644\u0628',
+        search: '\u0627\u0628\u062d\u062b \u0628\u0627\u0633\u0645 \u0627\u0644\u0628\u0631\u0646\u0627\u0645\u062c \u0623\u0648 \u0627\u0644\u0645\u0647\u0627\u0631\u0629...',
+        all: '\u0643\u0644 \u0627\u0644\u062d\u0627\u0644\u0627\u062a',
+        available: '\u0645\u062a\u0627\u062d',
+        inProgress: '\u0642\u064a\u062f \u0627\u0644\u062a\u0639\u0644\u0645',
+        locked: '\u0645\u0642\u0641\u0648\u0644',
+        completed: '\u0645\u0643\u062a\u0645\u0644',
+        expand: '\u0641\u062a\u062d \u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644',
+        collapse: '\u0637\u064a \u0627\u0644\u062a\u0641\u0627\u0635\u064a\u0644',
+        hide: '\u0625\u062e\u0641\u0627\u0621 \u0627\u0644\u0623\u062f\u0648\u0627\u062a',
+        show: '\u0625\u0638\u0647\u0627\u0631 \u0627\u0644\u0623\u062f\u0648\u0627\u062a',
+        empty: '\u0644\u0627 \u062a\u0648\u062c\u062f \u0628\u0631\u0627\u0645\u062c \u0645\u0637\u0627\u0628\u0642\u0629 \u0644\u0644\u0628\u062d\u062b \u0623\u0648 \u0627\u0644\u0641\u0644\u062a\u0631 \u0627\u0644\u062d\u0627\u0644\u064a.',
+        result: count => `${count} \u0646\u062a\u064a\u062c\u0629`
       }
     : {
         title: 'Student tools',
@@ -854,7 +826,6 @@ function getCourseToolsCopy(lang) {
         result: count => `${count} result${count === 1 ? '' : 's'} shown`
       };
 }
-
 function inferProgramMeta(node, lang, depth, hasChildren, status) {
   const title = `${node.title_ar || ''} ${node.title_en || ''}`.toLowerCase();
   const isStage = hasChildren || node.node_type === 'stage' || title.includes('stage') || title.includes('مرحلة') || title.includes('المرحلة');

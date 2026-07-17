@@ -239,34 +239,8 @@
   }
 
   async function renderSiteContacts() {
-    if (typeof bsGetSiteContacts !== 'function') return;
-    const contacts = await bsGetSiteContacts(false);
-    if (!contacts.length) return;
-
-    const iconWrap = document.querySelector('[data-site-contact-icons]');
-    const listWrap = document.querySelector('[data-site-contact-list]');
-
-    if (iconWrap) {
-      iconWrap.innerHTML = contacts.map(contact => {
-        const type = String(contact.icon_key || contact.contact_type || 'custom').toLowerCase();
-        const icon = contactIcons[type] || contactIcons.custom;
-        const label = contactLabel(contact);
-        const href = normalizeContactHref(contact);
-        const targetAttrs = href.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"';
-        return `<a class="footer-contact-icon-link" href="${href}" aria-label="${label}" title="${label}"${targetAttrs}>${icon}</a>`;
-      }).join('');
-    }
-
-    if (listWrap) {
-      listWrap.innerHTML = contacts.map(contact => {
-        const type = String(contact.icon_key || contact.contact_type || 'custom').toLowerCase();
-        const icon = contactIcons[type] || contactIcons.custom;
-        const label = contactLabel(contact);
-        const href = normalizeContactHref(contact);
-        const targetAttrs = href.startsWith('mailto:') ? '' : ' target="_blank" rel="noopener"';
-        return `<a class="footer-contact-link footer-contact-icon-link" href="${href}" aria-label="${label}" title="${label}"${targetAttrs}>${icon}</a>`;
-      }).join('');
-    }
+    // Footer contact shortcuts are intentionally hidden here to avoid duplicate contact areas.
+    return;
   }
 
   /* ---- Restore session on page load (if any) ---- */
