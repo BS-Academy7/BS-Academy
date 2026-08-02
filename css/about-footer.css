@@ -322,6 +322,7 @@
 .university-logo-marquee {
   width: 100%;
   overflow: hidden;
+  direction: ltr;
   padding-block: 2px;
   mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
@@ -333,10 +334,6 @@
   gap: var(--space-3);
   animation: university-logo-scroll 36s linear infinite;
   will-change: transform;
-}
-
-[dir="rtl"] .university-logo-track {
-  animation-direction: reverse;
 }
 
 .university-logo-marquee:hover .university-logo-track,
