@@ -269,9 +269,38 @@
 .about-founder {
   margin-top: var(--space-8);
   padding: var(--space-6);
+  display: grid;
+  grid-template-columns: minmax(180px, 0.72fr) minmax(0, 1.28fr);
+  gap: var(--space-6);
+  align-items: center;
   border: 1px solid rgba(196, 166, 91, 0.22);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.035);
+}
+
+.founder-portrait {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 4 / 5;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--ink-navy);
+}
+
+.founder-portrait img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center 27%;
+  transform: scale(1.34);
+  transform-origin: center 29%;
+}
+
+.founder-details {
+  min-width: 0;
 }
 
 .about-founder h3 {
@@ -293,6 +322,22 @@
   margin: var(--space-2) 0 var(--space-4);
   object-fit: contain;
   filter: none;
+}
+
+@media (max-width: 680px) {
+  .about-founder {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .founder-portrait {
+    width: min(100%, 300px);
+    margin-inline: auto;
+  }
+
+  .founder-signature {
+    margin-inline: auto;
+  }
 }
 
 .about-universities {
