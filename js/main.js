@@ -182,15 +182,31 @@
     custom: '<span class="contact-icon-text">link</span>'
   };
 
-  const contactPrefillMessage = [
-    'مرحبًا B&S Academy',
-    '',
-    'أرغب في التواصل مع فريق الأكاديمية.',
-    '',
-    'الاسم:',
-    'نوع الطلب:',
-    'التفاصيل:'
-  ].join('\n');
+  function getContactMessage() {
+    if (typeof currentLang !== 'undefined' && currentLang === 'en') {
+      return [
+        'Hello B&S Academy team,',
+        '',
+        'I would like to ask about:',
+        'Name:',
+        'Inquiry type: Course / On-Demand lesson / Registration / Support',
+        'Subject or specialization:',
+        'Country:',
+        'Details:'
+      ].join('\n');
+    }
+
+    return [
+      'مرحبًا فريق B&S Academy،',
+      '',
+      'أرغب في الاستفسار عن:',
+      'الاسم:',
+      'نوع الاستفسار: دورة / محاضرة مخصصة / تسجيل / دعم فني',
+      'التخصص أو المادة:',
+      'الدولة:',
+      'التفاصيل:'
+    ].join('\n');
+  }
 
   function contactLabel(contact) {
     if (!contact) return '';
@@ -212,7 +228,7 @@
         .replace(/^t\.me\//i, '')
         .replace(/^telegram\.me\//i, '')
         .split(/[?#]/)[0];
-      return `https://telegram.me/${encodeURIComponent(username)}?text=${encodeURIComponent(contactPrefillMessage)}`;
+      return `https://t.me/${encodeURIComponent(username)}?text=${encodeURIComponent(getContactMessage())}`;
     }
 
     if (type === 'email') {
@@ -224,7 +240,8 @@
         // Keep the plain href parsing path for mailto and raw email values.
       }
       if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        return `mailto:${email}`;
+        const subject = currentLang === 'en' ? 'B&S Academy Inquiry' : 'استفسار إلى B&S Academy';
+        return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(getContactMessage())}`;
       }
       return href;
     }
@@ -233,9 +250,37 @@
 
     const phoneMatch = href.match(/[?&]phone=([+\d]+)/i) || href.match(/wa\.me\/([+\d]+)/i);
     if (phoneMatch && phoneMatch[1]) {
-      return `https://wa.me/${phoneMatch[1].replace(/\D/g, '')}`;
+      return `https://wa.me/${phoneMatch[1].replace(/\D/g, '')}?text=${encodeURIComponent(getContactMessage())}`;
     }
-    return href.replace(/([?&])text=[^&]*/i, '').replace(/[?&]$/, '');
+    const cleaned = href.replace(/([?&])text=[^&]*/i, '').replace(/[?&]$/, '');
+    const separator = cleaned.includes('?') ? '&' : '?';
+    return `${cleaned}${separator}text=${encodeURIComponent(getContactMessage())}`;
+  }
+
+  function refreshFooterContactLinks() {
+    const contacts = {
+      whatsapp: { href: 'https://wa.me/201550755928', contact_type: 'whatsapp' },
+      telegram: { href: 'https://t.me/B_AND_S_Academy', contact_type: 'telegram' },
+      email: { href: 'mailto:bs.academy.com@gmail.com', contact_type: 'email' }
+    };
+
+    document.querySelectorAll('[data-contact-channel]').forEach(link => {
+      const channel = link.dataset.contactChannel;
+      if (contacts[channel]) link.href = normalizeContactHref(contacts[channel]);
+    });
+  }
+
+  function initializeUniversityMarquee() {
+    const track = document.querySelector('.university-logo-track');
+    if (!track || track.dataset.ready === 'true') return;
+
+    Array.from(track.children).forEach(card => {
+      const clone = card.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      clone.querySelectorAll('img').forEach(image => image.alt = '');
+      track.appendChild(clone);
+    });
+    track.dataset.ready = 'true';
   }
 
   async function renderSiteContacts() {
@@ -246,6 +291,8 @@
   /* ---- Restore session on page load (if any) ---- */
   document.addEventListener('DOMContentLoaded', async () => {
     renderSiteContacts();
+    refreshFooterContactLinks();
+    initializeUniversityMarquee();
 
     const session = sessionStorage.getItem('bs_session');
     if (!session) return;
@@ -259,5 +306,7 @@
       }
     } catch {}
   });
+
+  document.addEventListener('bs:languagechange', refreshFooterContactLinks);
 
 })();
